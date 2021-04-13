@@ -6,4 +6,4 @@
 
 Ильичев Матвей(matvey.ilichev@gmail.com)
 
-Карпова Юля(mail)
+Карпова Юля(yul_karpova@mail.ru)
