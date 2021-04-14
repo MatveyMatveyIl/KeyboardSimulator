@@ -1,9 +1,12 @@
 import dictionary
 import sys
+import os
 import EXCEPTIONS
+from pictures import *
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QLabel
+    from PyQt5.QtGui import QIcon
 except Exception as e:
     print('PyQt5 not found: "{}".'.format(e))
     sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
@@ -19,6 +22,7 @@ class Window(QMainWindow):
     def set_user_interface(self):
         self.setWindowTitle('Keyboard simulator')
         self.setGeometry(500, 400, 600, 300)
+        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
 
         self.text_to_write = QLabel(self)
         self.text_to_write.setGeometry(50, 100, 500, 40)
