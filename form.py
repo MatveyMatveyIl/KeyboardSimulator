@@ -1,8 +1,7 @@
 import dictionary
 import sys
-import os
 import EXCEPTIONS
-from pictures import *
+import form_style
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QLabel
@@ -32,6 +31,7 @@ class Window(QMainWindow):
         self.user_text_box.setGeometry(50, 200, 500, 40)
         self.user_text_box.returnPressed.connect(self.on_click_enter)
         self.user_text_box.textEdited.connect(self.check_errors)
+        self.user_text_box.textEdited.connect(self.set_color)
 
     def on_click_enter(self):
         if self.user_text_box.text() == self.text_to_write.text():
@@ -50,8 +50,12 @@ class Window(QMainWindow):
                                           self.user_text_box.text()))
                             if a != b)
 
+    def set_color(self):
+        self.text_to_write.setStyleSheet('background-color: #a6f5c8')
+
 
 app = QApplication(sys.argv)
+#app.setStyleSheet(form_style.style)
 window = Window()
 window.show()
 sys.exit(app.exec_())
