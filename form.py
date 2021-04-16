@@ -9,7 +9,7 @@ try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
         QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter
-    from PyQt5.QtCore import QTimer, pyqtSlot
+    from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, Qt
 except Exception as e:
     print('PyQt5 not found: "{}".'.format(e))
     sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
@@ -40,7 +40,7 @@ class Window(QMainWindow):
     def set_user_text_box_interface(self):
         self.user_text_box = QTextEdit(self)
         self.user_text_box.setGeometry(50, 360, 701, 291)
-        self.user_text_box.textChanged.connect(self.on_click_enter)
+        self.user_text_box.installEventFilter(self)
         self.user_text_box.textChanged.connect(self.check_errors)
         self.user_text_box.textChanged.connect(self.update_time)
 
@@ -80,18 +80,21 @@ class Window(QMainWindow):
         levels.addAction("Предложения")
         levels.addAction("Текст")
 
-    @pyqtSlot()
-    def on_click_enter(self):
-        if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
-            self.user_text_box.setText('')
-            self.stopwatch.do_pause()
-            self.timer_label.setText('0:00.00')
-            try:
-                self.text_to_write.setText(next(self.level_text))
-                print('correct')
-            except StopIteration:
-                print('wrong')
-                pass #message
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.KeyPress and obj is self.user_text_box:
+            if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
+                if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
+                    self.user_text_box.clear()
+                    self.stopwatch.do_pause()
+                    self.timer_label.setText('0:00.00')
+                    try:
+                        self.text_to_write.setText(next(self.level_text))
+                        print('correct')
+                    except StopIteration:
+                        print('wrong')
+                        pass #message
+                    return True
+        return False
 
     @pyqtSlot()
     def check_errors(self):
