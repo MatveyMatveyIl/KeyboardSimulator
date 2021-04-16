@@ -21,7 +21,7 @@ class Window(QMainWindow):
         self.set_user_interface()
         self._errors = []
         self.stat = statistic.Statistic()
-        self.timer = StopWatch()
+        self.stop_watch = StopWatch()
 
     def set_user_interface(self):
         self.setWindowTitle('Keyboard simulator')
@@ -40,14 +40,15 @@ class Window(QMainWindow):
         self.user_text_box.setGeometry(50, 200, 500, 40)
         self.user_text_box.returnPressed.connect(self.on_click_enter)
         self.user_text_box.textChanged.connect(self.check_errors)
-        self.user_text_box.textChanged.connect(self.update_time)#спросить
+        self.user_text_box.textChanged.connect(self.update_time)
+        #self.user_text_box.textChanged.connect(self.set_color)#спросить
 
     def on_click_enter(self):
         if self.user_text_box.text() == self.text_to_write.text():
             self.user_text_box.setText('')
+            self.stop_watch.do_pause()
+            self.timer_label.setText('0:00.00')
             try:
-                self.timer.do_pause()
-                self.timer_label.setText('0:00.00')
                 self.text_to_write.setText(next(self.level_text))
                 print('correct')
             except StopIteration:
@@ -62,16 +63,18 @@ class Window(QMainWindow):
         #print(self._errors)
 
     def update_time(self):
-        self.timer.do_start()
+        self.stop_watch.do_start()
+        self.stop_watch.timer.timeout.connect(self.print_time)
+
+    def print_time(self):
         self.timer_label.setText(
-            "%d:%05.2f" % (self.timer.time // 60, self.timer.time % 60))
+            "%d:%05.2f" % (self.stop_watch.time // 60, self.stop_watch.time % 60))
 
-
-    #def set_color(self):
-        #self.text_to_write.setStyleSheet('background-color: #a6f5c8;')
-        # if len(self._errors) == 0:
-        #     pass
-        # self.text_to_write.setStyleSheet('background-color: #ff6e6e;')
+    def set_color(self):
+        self.text_to_write.setStyleSheet('background-color: #a6f5c8;')
+        if len(self._errors) == 0:
+            pass
+        self.text_to_write.setStyleSheet('background-color: #ff6e6e;')
 
 # class SyntaxHighlighter(QSyntaxHighlighter):
 #     def __init__(self, parrent):

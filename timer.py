@@ -1,4 +1,11 @@
-from PyQt5.QtCore import QTimer
+import sys
+import EXCEPTIONS
+try:
+    from PyQt5.QtCore import QTimer
+except Exception as e:
+    print('PyQt5 not found: "{}".'.format(e))
+    sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
+
 
 class StopWatch():
     def __init__(self):
@@ -8,7 +15,6 @@ class StopWatch():
         self.timer.setInterval(1)
         self.timer.timeout.connect(self.tick)
         self.in_progress = False
-
 
     def tick(self):
         self.time += 1/100
