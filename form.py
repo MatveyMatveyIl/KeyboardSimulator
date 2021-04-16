@@ -1,9 +1,13 @@
-import dictionary
-import sys
-import EXCEPTIONS
-import form_style
-import statistic
-from stopwatch import *
+try:
+    import dictionary
+    import sys
+    import EXCEPTIONS
+    import form_style
+    import statistic
+    from stopwatch import *
+except Exception as e:
+    print('Modules not found: "{}". Try reinstalling the app.'.format(e))
+    sys.exit(4)
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
@@ -48,6 +52,7 @@ class Window(QMainWindow):
         self.text_to_write = QTextEdit(self)
         self.text_to_write.setGeometry(60, 90, 661, 181)
         self.text_to_write.setReadOnly(True)
+        self.text_to_write.setAcceptDrops(False)
         self.text_to_write.wordWrapMode()
         self.text_to_write.setText(next(self.level_text))
 
@@ -57,7 +62,7 @@ class Window(QMainWindow):
         self.level_box.addItem("Уровень 1 - Слова")
         self.level_box.addItem("Уровень 2 - Предложения")
         self.level_box.addItem("Уровень 3 - Текст")
-        # self.level_box.activated.connect(self.set_color)
+        self.level_box.activated.connect(self.change_dictionary)
 
     def set_stopwatch_interface(self):
         self.timer_label = QLabel(self)
@@ -89,9 +94,7 @@ class Window(QMainWindow):
                     self.timer_label.setText('0:00.00')
                     try:
                         self.text_to_write.setText(next(self.level_text))
-                        print('correct')
                     except StopIteration:
-                        print('wrong')
                         pass #message
                     return True
         return False
@@ -102,7 +105,6 @@ class Window(QMainWindow):
                             enumerate(zip(self.text_to_write.toPlainText(),
                                           self.user_text_box.toPlainText()))
                             if a != b)
-        print(self._errors)
 
     @pyqtSlot()
     def update_time(self):
@@ -121,6 +123,10 @@ class Window(QMainWindow):
         if len(self._errors) == 0:
             pass
         self.text_to_write.setStyleSheet('background-color: #ff6e6e;')
+
+    @pyqtSlot()
+    def change_dictionary(self):
+        pass
 
 # class SyntaxHighlighter(QSyntaxHighlighter):
 #     def __init__(self, parrent):
