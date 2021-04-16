@@ -3,7 +3,7 @@ import sys
 import EXCEPTIONS
 import form_style
 import statistic
-from timer import *
+from stopwatch import *
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
@@ -22,7 +22,7 @@ class Window(QMainWindow):
         self.set_user_interface()
         self._errors = []
         self.stat = statistic.Statistic()
-        self.stop_watch = StopWatch()
+        self.stopwatch = StopWatch()
 
     def set_user_interface(self):
         self.set_window_interface()
@@ -82,7 +82,7 @@ class Window(QMainWindow):
     def on_click_enter(self):
         if self.user_text_box.text() == self.text_to_write.text():
             self.user_text_box.setText('')
-            self.stop_watch.do_pause()
+            self.stopwatch.do_pause()
             self.timer_label.setText('0:00.00')
             try:
                 self.text_to_write.setText(next(self.level_text))
@@ -101,14 +101,14 @@ class Window(QMainWindow):
 
     @pyqtSlot()
     def update_time(self):
-        self.stop_watch.do_start()
-        self.stop_watch.timer.timeout.connect(self.print_time)
+        self.stopwatch.do_start()
+        self.stopwatch.timer.timeout.connect(self.print_time)
 
     @pyqtSlot()
     def print_time(self):
         self.timer_label.setText(
-            "%d:%05.2f" % (self.stop_watch.time // 60,
-                           self.stop_watch.time % 60))
+            "%d:%05.2f" % (self.stopwatch.time // 60,
+                           self.stopwatch.time % 60))
 
     @pyqtSlot()
     def set_color(self):
