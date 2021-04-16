@@ -7,7 +7,9 @@ except Exception as e:
     sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
 
 
-class StopWatch():
+class StopWatch:
+    '''секундомер'''
+
     def __init__(self):
         super().__init__()
         self.time = 0
@@ -29,3 +31,8 @@ class StopWatch():
         self.time = 0
         self.in_progress = False
 
+
+def seconds_to_minutes(time):
+    time = time.split(':')
+    min, sec = time[0], time[1]
+    return float(min) + float(sec) / 60

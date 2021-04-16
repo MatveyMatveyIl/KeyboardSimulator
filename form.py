@@ -7,7 +7,7 @@ from stopwatch import *
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
-        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction
+        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter
     from PyQt5.QtCore import QTimer, pyqtSlot
 except Exception as e:
@@ -38,15 +38,17 @@ class Window(QMainWindow):
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
 
     def set_user_text_box_interface(self):
-        self.user_text_box = QLineEdit(self)
+        self.user_text_box = QTextEdit(self)
         self.user_text_box.setGeometry(50, 360, 701, 291)
-        self.user_text_box.returnPressed.connect(self.on_click_enter)
+        self.user_text_box.textChanged.connect(self.on_click_enter)
         self.user_text_box.textChanged.connect(self.check_errors)
         self.user_text_box.textChanged.connect(self.update_time)
 
     def set_text_to_write_interface(self):
-        self.text_to_write = QLabel(self)
+        self.text_to_write = QTextEdit(self)
         self.text_to_write.setGeometry(60, 90, 661, 181)
+        self.text_to_write.setReadOnly(True)
+        self.text_to_write.wordWrapMode()
         self.text_to_write.setText(next(self.level_text))
 
     def set_level_box_interface(self):
@@ -80,7 +82,7 @@ class Window(QMainWindow):
 
     @pyqtSlot()
     def on_click_enter(self):
-        if self.user_text_box.text() == self.text_to_write.text():
+        if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
             self.user_text_box.setText('')
             self.stopwatch.do_pause()
             self.timer_label.setText('0:00.00')
@@ -94,10 +96,10 @@ class Window(QMainWindow):
     @pyqtSlot()
     def check_errors(self):
         self._errors = list(i for (i, (a, b)) in
-                            enumerate(zip(self.text_to_write.text(),
-                                          self.user_text_box.text()))
+                            enumerate(zip(self.text_to_write.toPlainText(),
+                                          self.user_text_box.toPlainText()))
                             if a != b)
-        #print(self._errors)
+        print(self._errors)
 
     @pyqtSlot()
     def update_time(self):
