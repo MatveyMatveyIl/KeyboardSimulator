@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'p.ui'
 import dictionary
 import sys
 import EXCEPTIONS
@@ -12,7 +9,7 @@ try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
         QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter
-    from PyQt5.QtCore import QTimer
+    from PyQt5.QtCore import QTimer, pyqtSlot
 except Exception as e:
     print('PyQt5 not found: "{}".'.format(e))
     sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
@@ -81,6 +78,7 @@ class Window(QMainWindow):
         levels.addAction("Предложения")
         levels.addAction("Текст")
 
+    @pyqtSlot()
     def on_click_enter(self):
         if self.user_text_box.text() == self.text_to_write.text():
             self.user_text_box.setText('')
@@ -93,6 +91,7 @@ class Window(QMainWindow):
                 print('wrong')
                 pass #message
 
+    @pyqtSlot()
     def check_errors(self):
         self._errors = list(i for (i, (a, b)) in
                             enumerate(zip(self.text_to_write.text(),
@@ -100,15 +99,18 @@ class Window(QMainWindow):
                             if a != b)
         #print(self._errors)
 
+    @pyqtSlot()
     def update_time(self):
         self.stop_watch.do_start()
         self.stop_watch.timer.timeout.connect(self.print_time)
 
+    @pyqtSlot()
     def print_time(self):
         self.timer_label.setText(
             "%d:%05.2f" % (self.stop_watch.time // 60,
                            self.stop_watch.time % 60))
 
+    @pyqtSlot()
     def set_color(self):
         self.text_to_write.setStyleSheet('background-color: #a6f5c8;')
         if len(self._errors) == 0:
