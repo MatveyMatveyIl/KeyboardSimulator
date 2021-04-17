@@ -15,6 +15,7 @@ try:
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor
     from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp
     import pyqtgraph as pg
+    import numpy as np
 except Exception as e:
     print('PyQt5 not found: "{}".'.format(e))
     sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
@@ -32,11 +33,6 @@ class MainWindow(QWidget):
         self.help = QPushButton(self)
         self.help.setGeometry(10, 40, 351, 51)
         self.help.setText("Помощь")
-        self.comboBox = QComboBox(self)
-        self.comboBox.setGeometry(10, 270, 351, 71)
-        self.comboBox.addItem("Уровень 1 - Слова")
-        self.comboBox.addItem("Уровень 2 - Предложения")
-        self.comboBox.addItem("Уровень 3 - Текст")
         self.textEdit = QTextEdit(self)
         self.textEdit.setGeometry(10, 180, 351, 41)
         self.textEdit.setText("Введите имя пользователя")
@@ -75,6 +71,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.set_level_box_interface()
         self.set_stopwatch_interface()
         self.set_menubar_interface()
+        self.set_statistic_interface()
 
     def set_window_interface(self):
         self.setWindowTitle('Keyboard simulator')
@@ -138,6 +135,12 @@ class WindowKeyboardTrainer(QMainWindow):
         self.w.show_main_window()
         self.w.close()
 
+    def set_statistic_interface(self):
+        self.btn = QPushButton(self)
+        self.btn.setGeometry(780, 410, 221, 41)
+        self.btn.setText("статистика")
+        self.btn.clicked.connect(self.show_statistic)
+
     def eventFilter(self, obj, event):
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
             if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
@@ -147,6 +150,7 @@ class WindowKeyboardTrainer(QMainWindow):
         return False
 
     def equal_strings(self):
+        self.user_text_box.clear()
         self.stopwatch.do_pause()
         self.stat.process_data(
             self.timer_label.text(), {
@@ -154,7 +158,6 @@ class WindowKeyboardTrainer(QMainWindow):
                 'count_symbols': len(self.text_to_write.toPlainText()),
             },
             self.text_to_write.toPlainText())
-        self.user_text_box.clear()
         self._mistakes = set()
         self.timer_label.setText('0:00.00')
         try:
@@ -195,8 +198,7 @@ class WindowKeyboardTrainer(QMainWindow):
 
     @pyqtSlot()
     def show_statistic(self):
-        self.graph = pg.PlotWidget()
-
+        pass
 
 
 app = QApplication(sys.argv)
