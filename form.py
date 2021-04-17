@@ -11,24 +11,62 @@ except Exception as e:
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
-        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit
+    QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor
     from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp
+    import pyqtgraph as pg
 except Exception as e:
     print('PyQt5 not found: "{}".'.format(e))
     sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
 
 
-class Window(QMainWindow):
+class MainWindow(QWidget):
     def __init__(self):
-        super(Window, self).__init__()
+        super(MainWindow, self).__init__()
+        self.setWindowTitle('Keyboard simulator')
+        self.setFixedSize(380, 449)
+        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
+        self.setting = QPushButton(self)
+        self.setting.setGeometry(10, 110, 351, 51)
+        self.setting.setText("Настройки")
+        self.help = QPushButton(self)
+        self.help.setGeometry(10, 40, 351, 51)
+        self.help.setText("Помощь")
+        self.comboBox = QComboBox(self)
+        self.comboBox.setGeometry(10, 270, 351, 71)
+        self.comboBox.addItem("Уровень 1 - Слова")
+        self.comboBox.addItem("Уровень 2 - Предложения")
+        self.comboBox.addItem("Уровень 3 - Текст")
+        self.textEdit = QTextEdit(self)
+        self.textEdit.setGeometry(10, 180, 351, 41)
+        self.textEdit.setText("Введите имя пользователя")
+        self.save = QPushButton(self)
+        self.save.setGeometry(140, 220, 93, 28)
+        self.save.setText("Сохранить")
+        self.button = QPushButton(self)
+        self.button.setGeometry(60, 360, 261, 41)
+        self.button.setText("Продолжить")
+
+    def show_main_window(self):
+        self.w1 = MainWindow()
+        self.w1.button.clicked.connect(self.show_window_keyboard)
+        self.w1.button.clicked.connect(self.w1.close)
+        self.w1.show()
+
+    def show_window_keyboard(self):
+        self.w2 = WindowKeyboardTrainer()
+        self.w2.show()
+
+
+class WindowKeyboardTrainer(QMainWindow):
+    def __init__(self):
+        super(WindowKeyboardTrainer, self).__init__()
         self.level_text = iter(dictionary.sentences['easy'])
         self.set_user_interface()
         self._errors = []
         self._mistakes = set()
         self.stat = statistic.Statistic()
         self.stopwatch = StopWatch()
-        self.searchHighLight = SearchHighLight()
 
     def set_user_interface(self):
         self.set_window_interface()
@@ -49,7 +87,6 @@ class Window(QMainWindow):
         self.user_text_box.installEventFilter(self)
         self.user_text_box.textChanged.connect(self.check_errors)
         self.user_text_box.textChanged.connect(self.update_time)
-        self.user_text_box.textChanged.connect(self.on_search_text)
 
     def set_text_to_write_interface(self):
         self.text_to_write = QTextEdit(self)
@@ -76,7 +113,8 @@ class Window(QMainWindow):
         self.statusBar()
         menubar = self.menuBar()
         menubar.setGeometry(0, 0, 1028, 26)
-        menu = menubar.addMenu('Меню')
+        # menu = menubar.addMenu('Меню')
+        # menu.triggered.connect(self.func)
         stats = menubar.addMenu('Статистика')
         help = menubar.addMenu('Помощь')
         # self.stat1 = QAction("&По уровням", self)
@@ -85,8 +123,20 @@ class Window(QMainWindow):
         stats.addAction(self.stat2)
         levels = stats.addMenu("По уровням")
         levels.addAction("Слова")
+        # levels.triggered.connect(self.func)
         levels.addAction("Предложения")
         levels.addAction("Текст")
+        self.menu = QPushButton(self)
+        self.menu.setGeometry(780, 610, 221, 41)
+        self.menu.setText("Выход в меню")
+        self.menu.clicked.connect(self.func)
+        self.menu.clicked.connect(self.close)
+
+    def func(self):
+        self.w = MainWindow()
+        self.w.show()
+        self.w.show_main_window()
+        self.w.close()
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
@@ -97,13 +147,14 @@ class Window(QMainWindow):
         return False
 
     def equal_strings(self):
-        self.user_text_box.clear()
         self.stopwatch.do_pause()
         self.stat.process_data(
             self.timer_label.text(), {
                 'errors_count': len(self._mistakes),
-                'count_symbols': len(self.text_to_write.toPlainText())
-            })
+                'count_symbols': len(self.text_to_write.toPlainText()),
+            },
+            self.text_to_write.toPlainText())
+        self.user_text_box.clear()
         self._mistakes = set()
         self.timer_label.setText('0:00.00')
         try:
@@ -118,6 +169,7 @@ class Window(QMainWindow):
                                           self.user_text_box.toPlainText()))
                             if a != b)
         self._mistakes = self._mistakes.union(set(self._errors))
+
 
     @pyqtSlot()
     def update_time(self):
@@ -141,30 +193,17 @@ class Window(QMainWindow):
     def change_dictionary(self):
         pass
 
-    def on_search_text(self):
-        self.searchHighLight.searchText(self.user_text_box.toPlainText())
-        self.searchHighLight.highlightBlock(self.user_text_box.toPlainText())
-
-
-class SearchHighLight(QSyntaxHighlighter):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.pattern = QRegularExpression()
-
-
-    def highlightBlock(self, text):
-        format = QTextCharFormat()
-        format.setBackground(QColor('yellow'))
-        self.setFormat(0, len(text), format)
-
-    def searchText(self, text):
-        self.pattern = QRegularExpression(text)
-        # self.rehighlight()
+    @pyqtSlot()
+    def show_statistic(self):
+        self.graph = pg.PlotWidget()
 
 
 
 app = QApplication(sys.argv)
-#app.setStyleSheet(form_style.style)
-window = Window()
+# app.setStyleSheet(form_style.style)
+window = MainWindow()
 window.show()
+window.close()
+window.show_main_window()
 sys.exit(app.exec_())
+# app.setStyleSheet(form_style.style)
