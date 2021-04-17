@@ -12,8 +12,8 @@ except Exception as e:
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
         QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit
-    from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter
-    from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, Qt
+    from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor
+    from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp
 except Exception as e:
     print('PyQt5 not found: "{}".'.format(e))
     sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
@@ -25,8 +25,10 @@ class Window(QMainWindow):
         self.level_text = iter(dictionary.sentences['easy'])
         self.set_user_interface()
         self._errors = []
+        self._mistakes = set()
         self.stat = statistic.Statistic()
         self.stopwatch = StopWatch()
+        self.searchHighLight = SearchHighLight()
 
     def set_user_interface(self):
         self.set_window_interface()
@@ -47,6 +49,7 @@ class Window(QMainWindow):
         self.user_text_box.installEventFilter(self)
         self.user_text_box.textChanged.connect(self.check_errors)
         self.user_text_box.textChanged.connect(self.update_time)
+        self.user_text_box.textChanged.connect(self.on_search_text)
 
     def set_text_to_write_interface(self):
         self.text_to_write = QTextEdit(self)
@@ -89,15 +92,24 @@ class Window(QMainWindow):
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
             if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
                 if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
-                    self.user_text_box.clear()
-                    self.stopwatch.do_pause()
-                    self.timer_label.setText('0:00.00')
-                    try:
-                        self.text_to_write.setText(next(self.level_text))
-                    except StopIteration:
-                        pass #message
+                    self.equal_strings()
                     return True
         return False
+
+    def equal_strings(self):
+        self.user_text_box.clear()
+        self.stopwatch.do_pause()
+        self.stat.process_data(
+            self.timer_label.text(), {
+                'errors_count': len(self._mistakes),
+                'count_symbols': len(self.text_to_write.toPlainText())
+            })
+        self._mistakes = set()
+        self.timer_label.setText('0:00.00')
+        try:
+            self.text_to_write.setText(next(self.level_text))
+        except StopIteration:
+            pass  # message
 
     @pyqtSlot()
     def check_errors(self):
@@ -105,6 +117,7 @@ class Window(QMainWindow):
                             enumerate(zip(self.text_to_write.toPlainText(),
                                           self.user_text_box.toPlainText()))
                             if a != b)
+        self._mistakes = self._mistakes.union(set(self._errors))
 
     @pyqtSlot()
     def update_time(self):
@@ -128,12 +141,26 @@ class Window(QMainWindow):
     def change_dictionary(self):
         pass
 
-# class SyntaxHighlighter(QSyntaxHighlighter):
-#     def __init__(self, parrent):
-#         super().__init__(parrent)
-#
-#     def color_line(self, line_num):
-#         self.rehighlightBlock()
+    def on_search_text(self):
+        self.searchHighLight.searchText(self.user_text_box.toPlainText())
+        self.searchHighLight.highlightBlock(self.user_text_box.toPlainText())
+
+
+class SearchHighLight(QSyntaxHighlighter):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.pattern = QRegularExpression()
+
+
+    def highlightBlock(self, text):
+        format = QTextCharFormat()
+        format.setBackground(QColor('yellow'))
+        self.setFormat(0, len(text), format)
+
+    def searchText(self, text):
+        self.pattern = QRegularExpression(text)
+        # self.rehighlight()
+
 
 
 app = QApplication(sys.argv)
