@@ -113,7 +113,7 @@ class AddTextWindow(QWidget):
         self.word = QPushButton(self)
         self.word.setGeometry(100, 410, 181, 41)
         self.word.setText("Слова")
-        self.word.clicked.connect(create_words(self.text.toPlainText(), self.topic.toPlainText()))
+        #self.word.clicked.connect(create_words(self.text.toPlainText(), self.topic.toPlainText()))
         self.sentences = QPushButton(self)
         self.sentences.setGeometry(390, 410, 181, 41)
         self.sentences.setText("Предложения")
@@ -138,7 +138,7 @@ class AddTextWindow(QWidget):
 class WindowKeyboardTrainer(QMainWindow):
     def __init__(self):
         super(WindowKeyboardTrainer, self).__init__()
-        self.level_text = iter(dictionary.sentences['easy'])
+        self.level_text = iter(dictionary.sentences['текст'])
         self.set_user_interface()
         self.stat = statistic.Statistic()
         self.stopwatch = StopWatch()
@@ -223,7 +223,6 @@ class WindowKeyboardTrainer(QMainWindow):
             if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
                 if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
                     self.equal_strings()
-                    print(self.level_box.get())
                     return True
         return False
 
