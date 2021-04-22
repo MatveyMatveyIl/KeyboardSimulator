@@ -1,5 +1,3 @@
-import create_user_dict
-
 try:
     import dictionary
     import sys
@@ -15,7 +13,7 @@ except Exception as e:
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
-        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton
+    QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, QMessageBox
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush
     from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp
     import pyqtgraph as pg
@@ -29,7 +27,7 @@ class MainWindow(QWidget):
         super(MainWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(380, 449)
-        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
+        self.setWindowIcon(QIcon('pictures/ammIcon.png'))
         self.helper = QPushButton(self)
         self.helper.setGeometry(50, 20, 261, 51)
         self.helper.setText("Помощь")
@@ -68,10 +66,6 @@ class MainWindow(QWidget):
     def show_add_text(self):
         self.w4 = AddTextWindow()
         self.w4.show()
-
-    # def show_stat(self):
-    #     self.st1 = Stat()
-    #     self.st1.showed()
 
 
 class UserWindow(QWidget):
@@ -119,18 +113,16 @@ class AddTextWindow(QWidget):
         self.label = QPushButton(self)
         self.label.setGeometry(670, 410, 181, 41)
         self.label.setText("Текст")
-        self.word.clicked.connect(self.open_mainWindow)
+        self.close_btn = QPushButton(self)
+        self.close_btn.setGeometry(700, 410, 181, 41)
+        self.close_btn.setText('Назад')
         self.word.clicked.connect(self.add_words)
-        self.word.clicked.connect(self.close)
-        self.sentences.clicked.connect(self.open_mainWindow)
         self.sentences.clicked.connect(self.add_sentences)
-        self.sentences.clicked.connect(self.close)
-        self.label.clicked.connect(self.open_mainWindow)
         self.label.clicked.connect(self.add_text)
-        self.label.clicked.connect(self.close)
+        self.close_btn.clicked.connect(self.open_mainWindow)
+        self.close_btn.clicked.connect(self.close)
 
     def open_mainWindow(self):
-        create_words(self.text.toPlainText(), self.topic.toPlainText())
         self.w = MainWindow()
         self.w.show()
         self.w.show_main_window()
@@ -138,18 +130,29 @@ class AddTextWindow(QWidget):
 
     def add_words(self):
         create_words(self.text.toPlainText(), self.topic.toPlainText())
+        if len(self.text.toPlainText()) == 0:
+            QMessageBox.critical(self, "Ошибка", "Вы не ввели текст", QMessageBox.Ok)
+        if len(self.topic.toPlainText()) == 0:
+            QMessageBox.critical(self, "Ошибка", "Введите название", QMessageBox.Ok)
 
     def add_sentences(self):
         create_sentences(self.text.toPlainText(), self.topic.toPlainText())
+        if len(self.text.toPlainText()) == 0:
+            QMessageBox.critical(self, "Ошибка", "Вы не ввели текст", QMessageBox.Ok)
+        if len(self.topic.toPlainText()) == 0:
+            QMessageBox.critical(self, "Ошибка", "Введите название", QMessageBox.Ok)
 
     def add_text(self):
         create_text(self.text.toPlainText(), self.topic.toPlainText())
+        if len(self.text.toPlainText()) == 0:
+            QMessageBox.critical(self, "Ошибка", "Вы не ввели текст", QMessageBox.Ok)
+        if len(self.topic.toPlainText()) == 0:
+            QMessageBox.critical(self, "Ошибка", "Введите название", QMessageBox.Ok)
 
 
 class WindowKeyboardTrainer(QMainWindow):
     def __init__(self):
         super(WindowKeyboardTrainer, self).__init__()
-        self.level_text = iter(dictionary.sentences['текст'])
         self.set_user_interface()
         self.stat = statistic.Statistic()
         self.stopwatch = StopWatch()
@@ -173,7 +176,6 @@ class WindowKeyboardTrainer(QMainWindow):
         self.user_text_box.setGeometry(60, 410, 661, 181)
         self.user_text_box.installEventFilter(self)
         self.user_text_box.textChanged.connect(self.check_errors)
-        self.user_text_box.textChanged.connect(self.update_time)
 
     def set_text_to_write_interface(self):
         self.text_to_write = QTextEdit(self)
@@ -181,7 +183,6 @@ class WindowKeyboardTrainer(QMainWindow):
         self.text_to_write.setReadOnly(True)
         self.text_to_write.setAcceptDrops(False)
         self.text_to_write.wordWrapMode()
-        self.text_to_write.setText(next(self.level_text))
 
     def set_level_box_interface(self):
         self.level_box = QComboBox(self)
@@ -196,9 +197,10 @@ class WindowKeyboardTrainer(QMainWindow):
         self.start = QPushButton(self)
         self.start.setGeometry(100, 320, 190, 71)
         self.start.setText("Старт")
+        self.start.clicked.connect(self.start_session)
         self.finish = QPushButton(self)
         self.finish.setGeometry(440, 320, 190, 71)
-        self.finish.setText("Конец")
+        self.finish.setText("Пауза")
         self.time = QLabel(self)
         self.time.setText("Время сеанса:")
         self.time.setGeometry(790, 300, 120, 52)
@@ -212,9 +214,10 @@ class WindowKeyboardTrainer(QMainWindow):
         self.symb1.setGeometry(920, 340, 120, 52)
         self.symb1.setText("00")
 
-    # def show_window1(self):
-    #     self.w = Window1()
-    #     self.w.show()
+    def start_session(self):
+        self.level_text = iter(dictionary.sentences[self.level_box.currentText()])
+        self.user_text_box.textChanged.connect(self.update_time)
+        self.text_to_write.setText(next(self.level_text))
 
     def set_menubar_interface(self):
         self.menu = QPushButton(self)
@@ -304,7 +307,7 @@ class WindowKeyboardTrainer(QMainWindow):
 
 
 app = QApplication(sys.argv)
-# app.setStyleSheet(form_style.style)
+#app.setStyleSheet(form_style.style)
 window = MainWindow()
 window.show()
 window.close()
