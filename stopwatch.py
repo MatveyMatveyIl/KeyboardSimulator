@@ -27,6 +27,7 @@ class StopWatch:
             self.in_progress = True
 
     def do_pause(self):
+        self.in_progress = False
         self.timer.stop()
 
     def do_finish(self):

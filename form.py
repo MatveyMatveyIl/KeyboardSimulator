@@ -13,7 +13,8 @@ except Exception as e:
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
-    QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, QMessageBox
+        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
+        QMessageBox
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush
     from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp
     import pyqtgraph as pg
@@ -52,7 +53,7 @@ class MainWindow(QWidget):
         self.w1.user.clicked.connect(self.w1.close)
         self.w1.add_text.clicked.connect(self.show_add_text)
         self.w1.add_text.clicked.connect(self.w1.close)
-        #self.w1.stat.clicked.connect(self.show_stat)
+        # self.w1.stat.clicked.connect(self.show_stat)
         self.w1.show()
 
     def show_window_keyboard(self):
@@ -130,24 +131,23 @@ class AddTextWindow(QWidget):
 
     def add_words(self):
         create_words(self.text.toPlainText(), self.topic.toPlainText())
-        if len(self.text.toPlainText()) == 0:
-            QMessageBox.critical(self, "Ошибка", "Вы не ввели текст", QMessageBox.Ok)
-        if len(self.topic.toPlainText()) == 0:
-            QMessageBox.critical(self, "Ошибка", "Введите название", QMessageBox.Ok)
+        self.critical_text()
 
     def add_sentences(self):
         create_sentences(self.text.toPlainText(), self.topic.toPlainText())
-        if len(self.text.toPlainText()) == 0:
-            QMessageBox.critical(self, "Ошибка", "Вы не ввели текст", QMessageBox.Ok)
-        if len(self.topic.toPlainText()) == 0:
-            QMessageBox.critical(self, "Ошибка", "Введите название", QMessageBox.Ok)
+        self.critical_text()
 
     def add_text(self):
         create_text(self.text.toPlainText(), self.topic.toPlainText())
+        self.critical_text()
+
+    def critical_text(self):
         if len(self.text.toPlainText()) == 0:
             QMessageBox.critical(self, "Ошибка", "Вы не ввели текст", QMessageBox.Ok)
-        if len(self.topic.toPlainText()) == 0:
+        elif len(self.topic.toPlainText()) == 0:
             QMessageBox.critical(self, "Ошибка", "Введите название", QMessageBox.Ok)
+        else:
+            QMessageBox.information(self, "Успешно", "Словарь создан", QMessageBox.Ok)
 
 
 class WindowKeyboardTrainer(QMainWindow):
@@ -155,7 +155,7 @@ class WindowKeyboardTrainer(QMainWindow):
         super(WindowKeyboardTrainer, self).__init__()
         self.set_user_interface()
         self.stat = statistic.Statistic()
-        self.stopwatch = StopWatch()
+        self.full_stopwatch = StopWatch()
         self.symbols_state = []
 
     def set_user_interface(self):
@@ -176,6 +176,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.user_text_box.setGeometry(60, 410, 661, 181)
         self.user_text_box.installEventFilter(self)
         self.user_text_box.textChanged.connect(self.check_errors)
+        self.user_text_box.textChanged.connect(self.update_statistic)
 
     def set_text_to_write_interface(self):
         self.text_to_write = QTextEdit(self)
@@ -200,13 +201,14 @@ class WindowKeyboardTrainer(QMainWindow):
         self.start.clicked.connect(self.start_session)
         self.finish = QPushButton(self)
         self.finish.setGeometry(440, 320, 190, 71)
-        self.finish.setText("Пауза")
-        self.time = QLabel(self)
-        self.time.setText("Время сеанса:")
-        self.time.setGeometry(790, 300, 120, 52)
-        self.time1 = QLabel(self)
-        self.time1.setGeometry(890, 300, 120, 52)
-        self.time1.setText("00:00:00")
+        self.finish.setText("Завершить")
+        self.finish.clicked.connect(self.end_session)
+        self.full_time_label = QLabel(self)
+        self.full_time_label.setText("Время сеанса:")
+        self.full_time_label.setGeometry(790, 300, 120, 52)
+        self.full_time_value = QLabel(self)
+        self.full_time_value.setGeometry(890, 300, 120, 52)
+        self.full_time_value.setText("00:00:00")
         self.symb = QLabel(self)
         self.symb.setText("Символов в минуту:")
         self.symb.setGeometry(790, 340, 120, 52)
@@ -215,18 +217,24 @@ class WindowKeyboardTrainer(QMainWindow):
         self.symb1.setText("00")
 
     def start_session(self):
+        self.stopwatch = StopWatch()
         self.level_text = iter(dictionary.sentences[self.level_box.currentText()])
         self.user_text_box.textChanged.connect(self.update_time)
         self.text_to_write.setText(next(self.level_text))
+
+    def end_session(self):
+        self.text_to_write.setText('')
+        self.stopwatch.do_finish()
+        self.timer_label.setText('0:00.00')
 
     def set_menubar_interface(self):
         self.menu = QPushButton(self)
         self.menu.setGeometry(780, 610, 221, 41)
         self.menu.setText("Выход в меню")
-        self.menu.clicked.connect(self.func)
+        self.menu.clicked.connect(self.switch_window)
         self.menu.clicked.connect(self.close)
 
-    def func(self):
+    def switch_window(self):
         self.w = MainWindow()
         self.w.show()
         self.w.show_main_window()
@@ -243,6 +251,7 @@ class WindowKeyboardTrainer(QMainWindow):
     def equal_strings(self):
         self.user_text_box.clear()
         self.stopwatch.do_finish()
+        self.full_stopwatch.do_pause()
         self.stat.process_data(
             self.timer_label.text(),
             self.text_to_write.toPlainText())
@@ -251,7 +260,7 @@ class WindowKeyboardTrainer(QMainWindow):
         try:
             self.text_to_write.setText(next(self.level_text))
         except StopIteration:
-            pass  # message
+            QMessageBox.information(self, "Вы закончили", 'поздравляем', QMessageBox.Ok)
 
     @pyqtSlot()
     def check_errors(self):
@@ -267,6 +276,7 @@ class WindowKeyboardTrainer(QMainWindow):
     @pyqtSlot()
     def update_time(self):
         self.stopwatch.do_start()
+        self.full_stopwatch.do_start()
         self.stopwatch.timer.timeout.connect(self.print_time)
 
     @pyqtSlot()
@@ -274,6 +284,13 @@ class WindowKeyboardTrainer(QMainWindow):
         self.timer_label.setText(
             "%d:%05.2f" % (self.stopwatch.time // 60,
                            self.stopwatch.time % 60))
+        self.full_time_value.setText(
+            "%d:%05.2f" % (self.full_stopwatch.time // 60,
+                           self.full_stopwatch.time % 60))
+
+    @pyqtSlot()
+    def update_statistic(self):
+        self.symb1.setText(str(self.stat.statistic['WPM'].value))
 
     @pyqtSlot()
     def set_color(self, state_list):
@@ -301,13 +318,9 @@ class WindowKeyboardTrainer(QMainWindow):
                     cursor.mergeCharFormat(format)
         self.symbols_state = state_list
 
-    @pyqtSlot()
-    def change_dictionary(self):
-        pass
-
 
 app = QApplication(sys.argv)
-#app.setStyleSheet(form_style.style)
+# app.setStyleSheet(form_style.style)
 window = MainWindow()
 window.show()
 window.close()
