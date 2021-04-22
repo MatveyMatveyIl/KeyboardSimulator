@@ -8,16 +8,16 @@ class Statistic:
             'CPM': CPM(),
         }
 
-    def process_data(self, time, errors, text):
+    def process_data(self, time, text):
         for stat in self.statistic.values():
-            stat.count_stat(time, errors, text)
+            stat.count_stat(time, text)
 
 
 class WPM:
     def __init__(self):
         self.value = 0
 
-    def count_stat(self, time, errors, text):
+    def count_stat(self, time, text):
         self.value += len(text.split(' ')) // seconds_to_minutes(time)
 
 
@@ -25,5 +25,5 @@ class CPM:
     def __init__(self):
         self.value = 0
 
-    def count_stat(self, time, errors, text):
-        self.value += (errors['errors_count'] + errors['count_symbols']) // seconds_to_minutes(time)
+    def count_stat(self, time, text):
+        self.value += len(text) // seconds_to_minutes(time)

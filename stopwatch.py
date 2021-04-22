@@ -1,5 +1,6 @@
 import sys
 import EXCEPTIONS
+
 try:
     from PyQt5.QtCore import QTimer
 except Exception as e:
@@ -9,7 +10,6 @@ except Exception as e:
 
 class StopWatch:
     '''секундомер'''
-
     def __init__(self):
         super().__init__()
         self.time = 0
@@ -19,7 +19,7 @@ class StopWatch:
         self.in_progress = False
 
     def tick(self):
-        self.time += 1/100
+        self.time += 1 / 100
 
     def do_start(self):
         if not self.in_progress:

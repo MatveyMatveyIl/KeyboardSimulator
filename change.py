@@ -1,133 +1,163 @@
-from PyQt5 import Qt
-import pyqtgraph as pg
-import numpy as np
+try:
+    import dictionary
+    import sys
+    import EXCEPTIONS
+    import form_style
+    import statistic
+    from stopwatch import *
+except Exception as e:
+    print('Modules not found: "{}". Try reinstalling the app.'.format(e))
+    sys.exit(4)
+
+try:
+    from PyQt5.QtWidgets import QApplication, QMainWindow, \
+        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit
+    from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor
+    from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp
+except Exception as e:
+    print('PyQt5 not found: "{}".'.format(e))
+    sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
 
 
-class Window(Qt.QWidget):
-
+class Window(QMainWindow):
     def __init__(self):
-        super().__init__()
+        super(Window, self).__init__()
+        self.level_text = iter(dictionary.sentences['easy'])
+        self.set_user_interface()
+        self._errors = []
+        self._mistakes = set()
+        self.stat = statistic.Statistic()
+        self.stopwatch = StopWatch()
 
-        layout = Qt.QVBoxLayout(self)
+    def set_user_interface(self):
+        self.set_window_interface()
+        self.set_user_text_box_interface()
+        self.set_text_to_write_interface()
+        self.set_level_box_interface()
+        self.set_stopwatch_interface()
+        self.set_menubar_interface()
 
-        self.view = view = pg.PlotWidget()
-        self.curve = view.plot(name="Line")
+    def set_window_interface(self):
+        self.setWindowTitle('Keyboard simulator')
+        self.setFixedSize(1028, 731)
+        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
 
-        self.btn = Qt.QPushButton("Random plot")
-        self.btn.clicked.connect(self.random_plot)
+    def set_user_text_box_interface(self):
+        self.user_text_box = QTextEdit(self)
+        self.user_text_box.setGeometry(50, 360, 701, 291)
+        self.user_text_box.installEventFilter(self)
+        self.user_text_box.textChanged.connect(self.check_errors)
+        self.user_text_box.textChanged.connect(self.update_time)
 
-        layout.addWidget(Qt.QLabel("Some text"))
-        layout.addWidget(self.view)
-        layout.addWidget(self.btn)
+    def set_text_to_write_interface(self):
+        self.text_to_write = QTextEdit(self)
+        self.text_to_write.setGeometry(60, 90, 661, 181)
+        self.text_to_write.setReadOnly(True)
+        self.text_to_write.setAcceptDrops(False)
+        self.text_to_write.wordWrapMode()
+        self.text_to_write.setText(next(self.level_text))
 
-    def random_plot(self):
-        random_array = np.random.random_sample(20)
-        self.curve.setData(random_array)
+    def set_level_box_interface(self):
+        self.level_box = QComboBox(self)
+        self.level_box.setGeometry(780, 100, 200, 60)
+        self.level_box.addItem("Уровень 1 - Слова")
+        self.level_box.addItem("Уровень 2 - Предложения")
+        self.level_box.addItem("Уровень 3 - Текст")
+        self.level_box.activated.connect(self.change_dictionary)
 
+    def set_stopwatch_interface(self):
+        self.timer_label = QLabel(self)
+        self.timer_label.setText('0:00.00')
+        self.timer_label.setGeometry(790, 360, 171, 81)
 
-if __name__ == "__main__":
-    app = Qt.QApplication([])
-    w = Window()
-    w.show()
-    app.exec()
-# import sys
-# from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QPlainTextEdit, QVBoxLayout
-# from PyQt5.QtCore import QRegExp
-# from PyQt5.QtGui import QColor, QRegExpValidator, QSyntaxHighlighter, QTextCharFormat
-#
-# class SyntaxHighlighter(QSyntaxHighlighter):
-#     def __init__(self, parnet):
-#         super().__init__(parnet)
-#         self.errors = {}
-#
-#     def highlight_line(self, line_num, fmt):
-#         if isinstance(line_num, int) and line_num >= 0 and isinstance(fmt, QTextCharFormat):
-#             self.errors[line_num] = fmt
-#             block = self.document().findBlockByNumber(line_num)
-#             self.rehighlightBlock(block)
-#
-#     def clear_highlight(self):
-#         self.errors = {}
-#         self.rehighlight()
-#
-#     def highlightBlock(self, text):
-#         blockNumber = self.currentBlock().blockNumber()
-#         fmt = self.errors.get(blockNumber)
-#         if fmt is not None:
-#             self.setFormat(0, 1, fmt)
-#
-# class AppDemo(QWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.resize(1200, 800)
-#
-#         mainLayout = QVBoxLayout()
-#
-#         validator = QRegExpValidator(QRegExp(r'[0-9]+'))
-#
-#         self.lineEdit = QLineEdit()
-#         self.lineEdit.setStyleSheet('font-size: 30px; height: 50px;')
-#         self.lineEdit.setValidator(validator)
-#         self.lineEdit.textChanged.connect(self.onTextChanged)
-#         mainLayout.addWidget(self.lineEdit)
-#
-#         self.textEditor = QPlainTextEdit()
-#         self.textEditor.setStyleSheet('font-size: 30px; color: green')
-#         mainLayout.addWidget(self.textEditor)
-#
-#         # for i in range(1, 21):
-#         #     self.textEditor.appendPlainText('Line {0}'.format(i))
-#
-#         self.highlighter = SyntaxHighlighter(self.textEditor.document())
-#         self.setLayout(mainLayout)
-#
-#     def onTextChanged(self, text):
-#         fmt = QTextCharFormat()
-#         fmt.setBackground(QColor('yellow'))
-#
-#         self.highlighter.clear_highlight()
-#
-#         try:
-#             lineNumber = int(text) - 1
-#             self.highlighter.highlight_line(lineNumber, fmt)
-#         except ValueError:
-#             pass
-#
-# app = QApplication(sys.argv)
-# demo = AppDemo()
-# demo.show()
-# sys.exit(app.exec_())
+    def set_menubar_interface(self):
+        self.statusBar()
+        menubar = self.menuBar()
+        menubar.setGeometry(0, 0, 1028, 26)
+        menu = menubar.addMenu('Меню')
+        stats = menubar.addMenu('Статистика')
+        help = menubar.addMenu('Помощь')
+        # self.stat1 = QAction("&По уровням", self)
+        self.stat2 = QAction("Лучший результат", self)
+        # stats.addAction(self.stat1)
+        stats.addAction(self.stat2)
+        levels = stats.addMenu("По уровням")
+        levels.addAction("Слова")
+        levels.addAction("Предложения")
+        levels.addAction("Текст")
 
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.KeyPress and obj is self.user_text_box:
+            if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
+                if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
+                    self.equal_strings()
+                    return True
+        return False
 
-# self._errors = list(i for (i, (a, b)) in
-        #                     enumerate(zip(self.text_to_write.toPlainText(),
-        #                                   self.user_text_box.text()))
-        #                     if a != b)
+    def equal_strings(self):
+        self.user_text_box.clear()
+        self.stopwatch.do_pause()
+        self.stat.process_data(
+            self.timer_label.text(), {
+                'errors_count': len(self._mistakes),
+                'count_symbols': len(self.text_to_write.toPlainText())
+            })
+        self._mistakes = set()
+        self.timer_label.setText('0:00.00')
+        try:
+            self.text_to_write.setText(next(self.level_text))
+        except StopIteration:
+            pass  # message
 
+    @pyqtSlot()
+    def check_errors(self):
+        self._errors = list(i for (i, (a, b)) in
+                            enumerate(zip(self.text_to_write.toPlainText(),
+                                          self.user_text_box.toPlainText()))
+                            if a != b)
+        self._mistakes = self._mistakes.union(set(self._errors))
 
-# @pyqtSlot()
-    # def on_click_enter(self):
-    #     #if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
-    #     if self.user_text_box.text() == self.text_to_write.toPlainText():
-    #         self.user_text_box.clear()
-    #         self.stopwatch.do_pause()
-    #         self.timer_label.setText('0:00.00')
-    #         try:
-    #             self.text_to_write.setText(next(self.level_text))
-    #             print('correct')
-    #         except StopIteration:
-    #             print('wrong')
-    #             pass #message
+    @pyqtSlot()
+    def update_time(self):
+        self.stopwatch.do_start()
+        self.stopwatch.timer.timeout.connect(self.print_time)
 
+    @pyqtSlot()
+    def print_time(self):
+        self.timer_label.setText(
+            "%d:%05.2f" % (self.stopwatch.time // 60,
+                           self.stopwatch.time % 60))
 
-# def set_user_text_box_interface(self):
-#     self.user_text_box = QLineEdit(self)
-#     self.user_text_box.setGeometry(50, 360, 701, 291)
-#     self.user_text_box.returnPressed.connect(self.on_click_enter)
-#     self.user_text_box.textChanged.connect(self.check_errors)
-#     self.user_text_box.textChanged.connect(self.update_time)
+    @pyqtSlot()
+    def set_color(self):
+        self.text_to_write.setStyleSheet('background-color: #a6f5c8;')
+        if len(self._errors) == 0:
+            pass
+        self.text_to_write.setStyleSheet('background-color: #ff6e6e;')
 
-# self.count_wrong_words = list(i for (i, (a, b)) in
-#                                               enumerate(zip(self.user_text_box.toPlainText().split(' '),
-#                                                             self.text_to_write.toPlainText().split(' ')))
-#                                               if a != b)
+    @pyqtSlot()
+    def change_dictionary(self):
+        pass
+
+    def on_search_text(self):
+        self.searchHighLight.searchText(self.user_text_box.toPlainText())
+        self.searchHighLight.highlightBlock(self.user_text_box.toPlainText())
+
+    class SearchHighLight(QSyntaxHighlighter):
+        def __init__(self, parent=None):
+            super().__init__(parent)
+            self.pattern = QRegularExpression()
+
+        def highlightBlock(self, text):
+            format = QTextCharFormat()
+            format.setBackground(QColor('yellow'))
+            self.setFormat(0, len(text), format)
+
+        def searchText(self, text):
+            self.pattern = QRegularExpression(text)
+            # self.rehighlight()
+app = QApplication(sys.argv)
+#app.setStyleSheet(form_style.style)
+window = Window()
+window.show()
+sys.exit(app.exec_())
