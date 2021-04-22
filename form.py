@@ -1,3 +1,5 @@
+import create_user_dict
+
 try:
     import dictionary
     import sys
@@ -5,6 +7,7 @@ try:
     import form_style
     import statistic
     from stopwatch import *
+    from create_user_dict import *
 
 except Exception as e:
     print('Modules not found: "{}". Try reinstalling the app.'.format(e))
@@ -71,7 +74,6 @@ class MainWindow(QWidget):
     #     self.st1.showed()
 
 
-
 class UserWindow(QWidget):
     def __init__(self):
         super(UserWindow, self).__init__()
@@ -111,20 +113,22 @@ class AddTextWindow(QWidget):
         self.word = QPushButton(self)
         self.word.setGeometry(100, 410, 181, 41)
         self.word.setText("Слова")
+        self.word.clicked.connect(create_words(self.text.toPlainText(), self.topic.toPlainText()))
         self.sentences = QPushButton(self)
         self.sentences.setGeometry(390, 410, 181, 41)
         self.sentences.setText("Предложения")
         self.label = QPushButton(self)
         self.label.setGeometry(670, 410, 181, 41)
         self.label.setText("Текст")
-        self.word.clicked.connect(self.func3)
-        self.word.clicked.connect(self.close)
-        self.sentences.clicked.connect(self.func3)
-        self.sentences.clicked.connect(self.close)
-        self.label.clicked.connect(self.func3)
-        self.label.clicked.connect(self.close)
+        #self.word.clicked.connect(self.func3)
+        #self.word.clicked.connect(self.close)
+        #self.sentences.clicked.connect(self.func3)
+        #self.sentences.clicked.connect(self.close)
+        #self.label.clicked.connect(self.func3)
+        #self.label.clicked.connect(self.close)
 
     def func3(self):
+        #create_words(self.text.toPlainText(), self.topic.toPlainText())
         self.w = MainWindow()
         self.w.show()
         self.w.show_main_window()
@@ -171,10 +175,8 @@ class WindowKeyboardTrainer(QMainWindow):
     def set_level_box_interface(self):
         self.level_box = QComboBox(self)
         self.level_box.setGeometry(780, 120, 200, 60)
-        self.level_box.addItem("Уровень 1 - Слова")
-        self.level_box.addItem("Уровень 2 - Предложения")
-        self.level_box.addItem("Уровень 3 - Текст")
-        self.level_box.activated.connect(self.change_dictionary)
+        for topic in dictionary.sentences.keys():
+            self.level_box.addItem(topic)
 
     def set_stopwatch_interface(self):
         self.timer_label = QLabel(self)
@@ -216,23 +218,18 @@ class WindowKeyboardTrainer(QMainWindow):
         self.w.show_main_window()
         self.w.close()
 
-    def set_statistic_interface(self):
-        self.btn = QPushButton(self)
-        self.btn.setGeometry(780, 410, 221, 41)
-        self.btn.setText("статистика")
-        self.btn.clicked.connect(self.show_statistic)
-
     def eventFilter(self, obj, event):
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
             if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
                 if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
                     self.equal_strings()
+                    print(self.level_box.get())
                     return True
         return False
 
     def equal_strings(self):
         self.user_text_box.clear()
-        self.stopwatch.do_pause()
+        self.stopwatch.do_finish()
         self.stat.process_data(
             self.timer_label.text(),
             self.text_to_write.toPlainText())
@@ -293,10 +290,6 @@ class WindowKeyboardTrainer(QMainWindow):
 
     @pyqtSlot()
     def change_dictionary(self):
-        pass
-
-    @pyqtSlot()
-    def show_statistic(self):
         pass
 
 

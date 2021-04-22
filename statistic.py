@@ -1,4 +1,5 @@
 from stopwatch import seconds_to_minutes
+from create_user_dict import multiple_replace
 
 
 class Statistic:
@@ -18,6 +19,7 @@ class WPM:
         self.value = 0
 
     def count_stat(self, time, text):
+        multiple_replace(text)
         self.value += len(text.split(' ')) // seconds_to_minutes(time)
 
 
