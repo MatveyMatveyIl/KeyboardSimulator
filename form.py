@@ -113,26 +113,37 @@ class AddTextWindow(QWidget):
         self.word = QPushButton(self)
         self.word.setGeometry(100, 410, 181, 41)
         self.word.setText("Слова")
-        #self.word.clicked.connect(create_words(self.text.toPlainText(), self.topic.toPlainText()))
         self.sentences = QPushButton(self)
         self.sentences.setGeometry(390, 410, 181, 41)
         self.sentences.setText("Предложения")
         self.label = QPushButton(self)
         self.label.setGeometry(670, 410, 181, 41)
         self.label.setText("Текст")
-        #self.word.clicked.connect(self.func3)
-        #self.word.clicked.connect(self.close)
-        #self.sentences.clicked.connect(self.func3)
-        #self.sentences.clicked.connect(self.close)
-        #self.label.clicked.connect(self.func3)
-        #self.label.clicked.connect(self.close)
+        self.word.clicked.connect(self.open_mainWindow)
+        self.word.clicked.connect(self.add_words)
+        self.word.clicked.connect(self.close)
+        self.sentences.clicked.connect(self.open_mainWindow)
+        self.sentences.clicked.connect(self.add_sentences)
+        self.sentences.clicked.connect(self.close)
+        self.label.clicked.connect(self.open_mainWindow)
+        self.label.clicked.connect(self.add_text)
+        self.label.clicked.connect(self.close)
 
-    def func3(self):
-        #create_words(self.text.toPlainText(), self.topic.toPlainText())
+    def open_mainWindow(self):
+        create_words(self.text.toPlainText(), self.topic.toPlainText())
         self.w = MainWindow()
         self.w.show()
         self.w.show_main_window()
         self.w.close()
+
+    def add_words(self):
+        create_words(self.text.toPlainText(), self.topic.toPlainText())
+
+    def add_sentences(self):
+        create_sentences(self.text.toPlainText(), self.topic.toPlainText())
+
+    def add_text(self):
+        create_text(self.text.toPlainText(), self.topic.toPlainText())
 
 
 class WindowKeyboardTrainer(QMainWindow):

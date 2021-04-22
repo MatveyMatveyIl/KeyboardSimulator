@@ -10,21 +10,17 @@ def multiple_replace(string_to_parse):
 
 
 def create_words(text, topic):
-    # dictionary.sentences[topic] = list(filter(lambda x: len(x) > 3,
-    #                                           [x.strip() for x in multiple_replace(text).split(' ')]))
-    return list(filter(lambda x: len(x) > 4,
+    dictionary.sentences[topic] = list(filter(lambda x: len(x) > 3,
                                               [x.strip() for x in multiple_replace(text).split(' ')]))
 
 
 def create_sentences(text, topic):
-    # dictionary.sentences[topic] = list(filter(lambda x: len(x) > 10,
-    #                    [x.strip() for x in re.split('\.|\?|!|\n', text)]))
-    return list(filter(lambda x: len(x) > 10,
+    dictionary.sentences[topic] = list(filter(lambda x: len(x) > 10,
                        [x.strip() for x in re.split('\.|\?|!|\n', text)]))
 
 
-def create_text(text):
-    return text
+def create_text(text, topic):
+    dictionary.sentences[topic] = text
 
 # s = input()
 # print(create_sentences(s))
