@@ -1,9 +1,9 @@
 try:
-    from modules.dictionary import sentences
+    from dictionary import sentences
     import sys
-    from modules import EXCEPTIONS
+    import random
+    from modules import EXCEPTIONS, statistic
     from modules import form_style
-    from modules import statistic
     from modules.stopwatch import *
     from modules.create_user_dict import *
 
@@ -233,9 +233,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.user_text_box.setReadOnly(False)
         self.user_text_box.clear()
         self.stopwatch = StopWatch()
-        self.level_text = iter(sentences[self.level_box.currentText()])
         self.user_text_box.textChanged.connect(self.update_time)
-        self.text_to_write.setText(next(self.level_text))
+        self.text_to_write.setText(random.choice(sentences[self.level_box.currentText()]))
 
     def end_session(self):
         self.user_text_box.setReadOnly(True)
@@ -260,6 +259,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.main_window.close()
 
     def eventFilter(self, obj, event):
+        """Check input if pressed key is Enter"""
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
             if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
                 if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
@@ -277,7 +277,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.symbols_state = []
         self.timer_label.setText('0:00.00')
         try:
-            self.text_to_write.setText(next(self.level_text))
+            self.text_to_write.setText(random.choice(sentences[self.level_box.currentText()]))
         except StopIteration:
             QMessageBox.information(self, "Вы закончили", 'поздравляем', QMessageBox.Ok)
 
@@ -294,6 +294,7 @@ class WindowKeyboardTrainer(QMainWindow):
 
     @pyqtSlot()
     def update_time(self):
+        """Stopwatch update"""
         self.stopwatch.do_start()
         self.full_stopwatch.do_start()
         self.stopwatch.timer.timeout.connect(self.print_time)
