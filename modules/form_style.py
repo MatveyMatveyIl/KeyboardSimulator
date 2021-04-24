@@ -70,7 +70,7 @@ QTextEdit
 {
    background:#E6E6FA;
    font: Arial;
-   font-size: 18px;
+   font-size: 22px;
    border: 1px solid black;
    border-radius: 5px;
    border-width: 2px;

@@ -199,6 +199,7 @@ class WindowKeyboardTrainer(QMainWindow):
             self.level_box.addItem(topic)
 
     def set_stopwatch_interface(self):
+        self.stopwatch = StopWatch()
         self.timer_label = QLabel(self)
         self.timer_label.setText('0:00.00')
         self.timer_label.setGeometry(330, 335, 75, 41)
@@ -230,15 +231,27 @@ class WindowKeyboardTrainer(QMainWindow):
         self.WPM_value.setText("00")
 
     def start_session(self):
-        """Session start handling"""
-        self.user_text_box.setReadOnly(False)
-        self.user_text_box.clear()
-        self.stopwatch = StopWatch()
-        self.user_text_box.textChanged.connect(self.update_time)
-        self.text_to_write.setText(random.choice(sentences[self.level_box.currentText()]))
+        """Session start/pause handling"""
+        if self.start.text() in {'Старт', 'Продолжить'}:
+            self.user_text_box.setReadOnly(False)
+            self.level_box.setDisabled(True)
+            if self.full_time_value != '0:00.00':
+                self.stopwatch.do_start()
+                self.full_stopwatch.do_start()
+            if len(self.text_to_write.toPlainText()) == 0:
+                self.text_to_write.setText(random.choice(sentences[self.level_box.currentText()]))
+            self.user_text_box.textChanged.connect(self.update_time)
+            self.start.setText('Пауза')
+        else:
+            self.user_text_box.setReadOnly(True)
+            self.level_box.setDisabled(False)
+            self.start.setText('Продолжить')
+            self.stopwatch.do_pause()
+            self.full_stopwatch.do_pause()
 
     def end_session(self):
         """End session handling"""
+        self.level_box.setDisabled(False)
         self.user_text_box.setReadOnly(True)
         self.user_text_box.clear()
         self.text_to_write.setText('')
@@ -246,6 +259,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.timer_label.setText('0:00.00')
         self.full_time_value.setText('0:00.00')
         self.full_stopwatch.time = 0
+        self.start.setText('Старт')
 
     def set_menubar_interface(self):
         self.menu = QPushButton(self)
