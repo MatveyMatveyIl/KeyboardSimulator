@@ -226,6 +226,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.text_to_write.setText('')
         self.stopwatch.do_finish()
         self.timer_label.setText('0:00.00')
+        self.full_time_value.setText('0:00.00')
 
     def set_menubar_interface(self):
         self.menu = QPushButton(self)
