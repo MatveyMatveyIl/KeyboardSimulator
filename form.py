@@ -230,6 +230,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.WPM_value.setText("00")
 
     def start_session(self):
+        """Session start handling"""
         self.user_text_box.setReadOnly(False)
         self.user_text_box.clear()
         self.stopwatch = StopWatch()
@@ -237,6 +238,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.text_to_write.setText(random.choice(sentences[self.level_box.currentText()]))
 
     def end_session(self):
+        """End session handling"""
         self.user_text_box.setReadOnly(True)
         self.user_text_box.clear()
         self.text_to_write.setText('')
@@ -283,6 +285,7 @@ class WindowKeyboardTrainer(QMainWindow):
 
     @pyqtSlot()
     def check_errors(self):
+        """Checks the entered text and compares errors with the original"""
         state_list = []
         if len(self.text_to_write.toPlainText()) >= len(self.user_text_box.toPlainText()):
             for position in range(len(self.user_text_box.toPlainText())):
@@ -315,29 +318,30 @@ class WindowKeyboardTrainer(QMainWindow):
 
     @pyqtSlot()
     def set_color(self, state_list):
-        """Brush symbols"""
+        """highlights valid and invalid characters"""
         cursor = self.text_to_write.textCursor()
         format = QTextCharFormat()
-        for char_text in range(len(state_list)):
-            if state_list[char_text][0] == 'correct':
-                cursor.setPosition(state_list[char_text][1])
-                cursor.movePosition(cursor.Right, 100)
-                format.setBackground(QBrush(QColor('#a6f5c8')))
-                cursor.mergeCharFormat(format)
-            elif state_list[char_text][0] == 'wrong':
-                cursor.setPosition(state_list[char_text][1])
-                cursor.movePosition(cursor.Right, 100)
-                format.setBackground(QBrush(QColor('#ff6e6e')))
-                cursor.mergeCharFormat(format)
-        if len(state_list) <= len(self.symbols_state):
-            for white in range(0, len(self.symbols_state)):
-                if white >= len(state_list):
-                    cursor.setPosition(self.symbols_state[white][1])
+        if len(self.user_text_box.toPlainText()) <= len(self.text_to_write.toPlainText()):
+            for char_text in range(len(state_list)):
+                if state_list[char_text][0] == 'correct':
+                    cursor.setPosition(state_list[char_text][1])
                     cursor.movePosition(cursor.Right, 100)
-                    brush = QBrush(QColor('#E6E6FA'))
-                    format.setBackground(brush)
+                    format.setBackground(QBrush(QColor('#a6f5c8')))
                     cursor.mergeCharFormat(format)
-        self.symbols_state = state_list
+                elif state_list[char_text][0] == 'wrong':
+                    cursor.setPosition(state_list[char_text][1])
+                    cursor.movePosition(cursor.Right, 100)
+                    format.setBackground(QBrush(QColor('#ff6e6e')))
+                    cursor.mergeCharFormat(format)
+            if len(state_list) <= len(self.symbols_state):
+                for white in range(0, len(self.symbols_state)):
+                    if white >= len(state_list):
+                        cursor.setPosition(self.symbols_state[white][1])
+                        cursor.movePosition(cursor.Right, 100)
+                        brush = QBrush(QColor('#E6E6FA'))
+                        format.setBackground(brush)
+                        cursor.mergeCharFormat(format)
+            self.symbols_state = state_list
 
 
 app = QApplication(sys.argv)
