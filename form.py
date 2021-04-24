@@ -1,10 +1,10 @@
 try:
-    import dictionary
+    from dictionary import sentences
     import sys
     import EXCEPTIONS
     import form_style
-    import statistic
-    from stopwatch import *
+    from modules import statistic
+    from modules.stopwatch import *
     from create_user_dict import *
 
 except Exception as e:
@@ -30,13 +30,13 @@ class MainWindow(QWidget):
         self.setFixedSize(380, 449)
         self.setWindowIcon(QIcon('pictures/ammIcon.png'))
         self.helper = QPushButton(self)
-        self.helper.setGeometry(50, 20, 261, 51)
+        self.helper.setGeometry(50, 30, 261, 51)
         self.helper.setText("Помощь")
         self.user = QPushButton(self)
-        self.user.setGeometry(50, 100, 261, 51)
+        self.user.setGeometry(50, 110, 261, 51)
         self.user.setText("Пользователь")
         self.add_text = QPushButton(self)
-        self.add_text.setGeometry(50, 180, 261, 51)
+        self.add_text.setGeometry(50, 190, 261, 51)
         self.add_text.setText("Добавить текст")
         self.stat = QPushButton(self)
         self.stat.setGeometry(50, 270, 261, 51)
@@ -77,16 +77,18 @@ class UserWindow(QWidget):
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
         self.login = QTextEdit(self)
         self.login.setGeometry(30, 20, 261, 51)
+        self.login.setPlaceholderText("Введите имя")
         self.add = QPushButton(self)
         self.add.setGeometry(30, 90, 261, 51)
         self.add.setText("Войти")
         self.save = QPushButton(self)
         self.save.setGeometry(30, 140, 261, 51)
         self.save.setText("Создать")
-        self.add.clicked.connect(self.func2)
-        self.add.clicked.connect(self.close)
-        self.save.clicked.connect(self.func2)
-        self.save.clicked.connect(self.close)
+        self.exit = QPushButton(self)
+        self.exit.setGeometry(30, 300, 261, 51)
+        self.exit.setText("Назад")
+        self.exit.clicked.connect(self.func2)
+        self.exit.clicked.connect(self.close)
 
     def func2(self):
         self.w = MainWindow()
@@ -99,23 +101,25 @@ class AddTextWindow(QWidget):
     def __init__(self):
         super(AddTextWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
-        self.setFixedSize(967, 497)
+        self.setFixedSize(967, 465)
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
         self.topic = QTextEdit(self)
-        self.topic.setGeometry(300, 30, 331, 51)
+        self.topic.setGeometry(305, 30, 331, 51)
+        self.topic.setPlaceholderText("Введите название")
         self.text = QTextEdit(self)
-        self.text.setGeometry(40, 130, 871, 251)
+        self.text.setGeometry(45, 130, 871, 251)
+        self.text.setPlaceholderText("Вставьте текст. Слова должны состоять как минимум из 3 символов, предложения из 10")
         self.word = QPushButton(self)
-        self.word.setGeometry(100, 410, 181, 41)
+        self.word.setGeometry(80, 410, 150, 41)
         self.word.setText("Слова")
         self.sentences = QPushButton(self)
-        self.sentences.setGeometry(390, 410, 181, 41)
+        self.sentences.setGeometry(280, 410, 150, 41)
         self.sentences.setText("Предложения")
         self.label = QPushButton(self)
-        self.label.setGeometry(670, 410, 181, 41)
+        self.label.setGeometry(480, 410, 150, 41)
         self.label.setText("Текст")
         self.close_btn = QPushButton(self)
-        self.close_btn.setGeometry(700, 410, 181, 41)
+        self.close_btn.setGeometry(680, 410, 150, 41)
         self.close_btn.setText('Назад')
         self.word.clicked.connect(self.add_words)
         self.sentences.clicked.connect(self.add_sentences)
@@ -173,14 +177,16 @@ class WindowKeyboardTrainer(QMainWindow):
 
     def set_user_text_box_interface(self):
         self.user_text_box = QTextEdit(self)
-        self.user_text_box.setGeometry(60, 410, 661, 181)
+        self.user_text_box.setGeometry(50, 410, 690, 270)
+        self.user_text_box.setPlaceholderText("Выберите словарь, нажмите старт и начните ввод")
         self.user_text_box.installEventFilter(self)
         self.user_text_box.textChanged.connect(self.check_errors)
         self.user_text_box.textChanged.connect(self.update_statistic)
+        self.user_text_box.setReadOnly(True)
 
     def set_text_to_write_interface(self):
         self.text_to_write = QTextEdit(self)
-        self.text_to_write.setGeometry(60, 120, 661, 181)
+        self.text_to_write.setGeometry(50, 30, 690, 270)
         self.text_to_write.setReadOnly(True)
         self.text_to_write.setAcceptDrops(False)
         self.text_to_write.wordWrapMode()
@@ -194,7 +200,7 @@ class WindowKeyboardTrainer(QMainWindow):
     def set_stopwatch_interface(self):
         self.timer_label = QLabel(self)
         self.timer_label.setText('0:00.00')
-        self.timer_label.setGeometry(340, 320, 171, 81)
+        self.timer_label.setGeometry(330, 335, 75, 41)
         self.start = QPushButton(self)
         self.start.setGeometry(100, 320, 190, 71)
         self.start.setText("Старт")
@@ -205,32 +211,43 @@ class WindowKeyboardTrainer(QMainWindow):
         self.finish.clicked.connect(self.end_session)
         self.full_time_label = QLabel(self)
         self.full_time_label.setText("Время сеанса:")
-        self.full_time_label.setGeometry(790, 300, 120, 52)
+        self.full_time_label.setGeometry(750, 300, 150, 41)
         self.full_time_value = QLabel(self)
-        self.full_time_value.setGeometry(890, 300, 120, 52)
+        self.full_time_value.setGeometry(890, 300, 90, 41)
         self.full_time_value.setText("00:00:00")
         self.symb = QLabel(self)
-        self.symb.setText("Символов в минуту:")
-        self.symb.setGeometry(790, 340, 120, 52)
+        self.symb.setText("CPM:")
+        self.symb.setGeometry(750, 340, 150, 41)
         self.symb1 = QLabel(self)
-        self.symb1.setGeometry(920, 340, 120, 52)
+        self.symb1.setGeometry(890, 340, 90, 41)
         self.symb1.setText("00")
+        self.words = QLabel(self)
+        self.words.setGeometry(750, 380, 150, 41)
+        self.words.setText("WPM:")
+        self.words1 = QLabel(self)
+        self.words1.setGeometry(890, 380, 90, 41)
+        self.words1.setText("00")
 
     def start_session(self):
+        self.user_text_box.setReadOnly(False)
+        self.user_text_box.clear()
         self.stopwatch = StopWatch()
-        self.level_text = iter(dictionary.sentences[self.level_box.currentText()])
+        self.level_text = iter(sentences[self.level_box.currentText()])
         self.user_text_box.textChanged.connect(self.update_time)
         self.text_to_write.setText(next(self.level_text))
 
     def end_session(self):
+        self.user_text_box.setReadOnly(True)
+        self.user_text_box.clear()
         self.text_to_write.setText('')
         self.stopwatch.do_finish()
         self.timer_label.setText('0:00.00')
         self.full_time_value.setText('0:00.00')
+        self.full_stopwatch.time = 0
 
     def set_menubar_interface(self):
         self.menu = QPushButton(self)
-        self.menu.setGeometry(780, 610, 221, 41)
+        self.menu.setGeometry(760, 610, 221, 41)
         self.menu.setText("Выход в меню")
         self.menu.clicked.connect(self.switch_window)
         self.menu.clicked.connect(self.close)
@@ -280,6 +297,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.full_stopwatch.do_start()
         self.stopwatch.timer.timeout.connect(self.print_time)
 
+
     @pyqtSlot()
     def print_time(self):
         self.timer_label.setText(
@@ -314,17 +332,16 @@ class WindowKeyboardTrainer(QMainWindow):
                 if white >= len(state_list):
                     cursor.setPosition(self.symbols_state[white][1])
                     cursor.movePosition(cursor.Right, 100)
-                    brush = QBrush(QColor('white'))
+                    brush = QBrush(QColor('#E6E6FA'))
                     format.setBackground(brush)
                     cursor.mergeCharFormat(format)
         self.symbols_state = state_list
 
 
 app = QApplication(sys.argv)
-# app.setStyleSheet(form_style.style)
+app.setStyleSheet(form_style.style)
 window = MainWindow()
 window.show()
 window.close()
 window.show_main_window()
 sys.exit(app.exec_())
-# app.setStyleSheet(form_style.style)

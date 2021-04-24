@@ -1,4 +1,4 @@
-from stopwatch import seconds_to_minutes
+from modules.stopwatch import seconds_to_minutes
 from create_user_dict import multiple_replace
 
 
