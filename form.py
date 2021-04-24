@@ -182,7 +182,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.user_text_box.setPlaceholderText("Выберите словарь, нажмите старт и начните ввод")
         self.user_text_box.installEventFilter(self)
         self.user_text_box.textChanged.connect(self.check_errors)
-        self.user_text_box.textChanged.connect(self.update_statistic)
+        #self.user_text_box.textChanged.connect(self.update_statistic)
         self.user_text_box.setReadOnly(True)
 
     def set_text_to_write_interface(self):
@@ -235,7 +235,7 @@ class WindowKeyboardTrainer(QMainWindow):
         if self.start.text() in {'Старт', 'Продолжить'}:
             self.user_text_box.setReadOnly(False)
             self.level_box.setDisabled(True)
-            if self.full_time_value != '0:00.00':
+            if self.full_time_value != '0:00.00' and len(self.user_text_box.toPlainText()) != 0:
                 self.stopwatch.do_start()
                 self.full_stopwatch.do_start()
             if len(self.text_to_write.toPlainText()) == 0:
@@ -287,9 +287,9 @@ class WindowKeyboardTrainer(QMainWindow):
         self.user_text_box.clear()
         self.stopwatch.do_finish()
         self.full_stopwatch.do_pause()
-        self.stat.process_data(
-            self.timer_label.text(),
-            self.text_to_write.toPlainText())
+        # self.stat.process_data(
+        #     self.timer_label.text(),
+        #     self.text_to_write.toPlainText())
         self.symbols_state = []
         self.timer_label.setText('0:00.00')
         try:
@@ -308,6 +308,7 @@ class WindowKeyboardTrainer(QMainWindow):
                 else:
                     state_list.append(('wrong', position))
         self.set_color(state_list)
+        self.stat.process_data(self.full_time_value.text(), ' ')
 
     @pyqtSlot()
     def update_time(self):
@@ -315,6 +316,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.stopwatch.do_start()
         self.full_stopwatch.do_start()
         self.stopwatch.timer.timeout.connect(self.print_time)
+        self.full_stopwatch.timer.timeout.connect(self.update_statistic)
 
 
     @pyqtSlot()
@@ -328,7 +330,7 @@ class WindowKeyboardTrainer(QMainWindow):
 
     @pyqtSlot()
     def update_statistic(self):
-        self.CPM_value.setText(str(self.stat.statistic['WPM'].value))
+        self.CPM_value.setText(str(self.stat.statistic['CPM'].value) + 'сим/мин')
 
     @pyqtSlot()
     def set_color(self, state_list):
