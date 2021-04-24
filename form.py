@@ -308,7 +308,8 @@ class WindowKeyboardTrainer(QMainWindow):
                 else:
                     state_list.append(('wrong', position))
         self.set_color(state_list)
-        self.stat.process_data(self.full_time_value.text(), ' ')
+        self.stat.process_data(self.full_time_value.text(), ' ',
+                               len(list(filter(lambda x: x[0] == 'wrong', self.symbols_state))))
 
     @pyqtSlot()
     def update_time(self):
