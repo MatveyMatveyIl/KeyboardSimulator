@@ -1,5 +1,5 @@
 from modules.stopwatch import seconds_to_minutes
-from create_user_dict import multiple_replace
+from modules.create_user_dict import multiple_replace
 
 
 class Statistic:

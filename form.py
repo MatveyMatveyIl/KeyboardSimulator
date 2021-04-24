@@ -1,11 +1,11 @@
 try:
-    from dictionary import sentences
+    from modules.dictionary import sentences
     import sys
-    import EXCEPTIONS
-    import form_style
+    from modules import EXCEPTIONS
+    from modules import form_style
     from modules import statistic
     from modules.stopwatch import *
-    from create_user_dict import *
+    from modules.create_user_dict import *
 
 except Exception as e:
     print('Modules not found: "{}". Try reinstalling the app.'.format(e))
@@ -46,27 +46,27 @@ class MainWindow(QWidget):
         self.button.setText("Начать")
 
     def show_main_window(self):
-        self.w1 = MainWindow()
-        self.w1.button.clicked.connect(self.show_window_keyboard)
-        self.w1.button.clicked.connect(self.w1.close)
-        self.w1.user.clicked.connect(self.show_user_interface)
-        self.w1.user.clicked.connect(self.w1.close)
-        self.w1.add_text.clicked.connect(self.show_add_text)
-        self.w1.add_text.clicked.connect(self.w1.close)
-        # self.w1.stat.clicked.connect(self.show_stat)
-        self.w1.show()
+        self.main_window = MainWindow()
+        self.main_window.button.clicked.connect(self.show_window_keyboard)
+        self.main_window.button.clicked.connect(self.main_window.close)
+        self.main_window.user.clicked.connect(self.show_user_interface)
+        self.main_window.user.clicked.connect(self.main_window.close)
+        self.main_window.add_text.clicked.connect(self.show_add_text)
+        self.main_window.add_text.clicked.connect(self.main_window.close)
+        # self.main_window.stat.clicked.connect(self.show_stat)
+        self.main_window.show()
 
     def show_window_keyboard(self):
-        self.w2 = WindowKeyboardTrainer()
-        self.w2.show()
+        self.window_trainer = WindowKeyboardTrainer()
+        self.window_trainer.show()
 
     def show_user_interface(self):
-        self.w3 = UserWindow()
-        self.w3.show()
+        self.user_window = UserWindow()
+        self.user_window.show()
 
     def show_add_text(self):
-        self.w4 = AddTextWindow()
-        self.w4.show()
+        self.dict_window = AddTextWindow()
+        self.dict_window.show()
 
 
 class UserWindow(QWidget):
@@ -87,14 +87,14 @@ class UserWindow(QWidget):
         self.exit = QPushButton(self)
         self.exit.setGeometry(30, 300, 261, 51)
         self.exit.setText("Назад")
-        self.exit.clicked.connect(self.func2)
+        self.exit.clicked.connect(self.show_main_window)
         self.exit.clicked.connect(self.close)
 
-    def func2(self):
-        self.w = MainWindow()
-        self.w.show()
-        self.w.show_main_window()
-        self.w.close()
+    def show_main_window(self):
+        self.main_window = MainWindow()
+        self.main_window.show()
+        self.main_window.show_main_window()
+        self.main_window.close()
 
 
 class AddTextWindow(QWidget):
@@ -108,7 +108,8 @@ class AddTextWindow(QWidget):
         self.topic.setPlaceholderText("Введите название")
         self.text = QTextEdit(self)
         self.text.setGeometry(45, 130, 871, 251)
-        self.text.setPlaceholderText("Вставьте текст. Слова должны состоять как минимум из 3 символов, предложения из 10")
+        self.text.setPlaceholderText(
+            "Вставьте текст. Слова должны состоять как минимум из 3 символов, предложения из 10")
         self.word = QPushButton(self)
         self.word.setGeometry(80, 410, 150, 41)
         self.word.setText("Слова")
@@ -128,10 +129,10 @@ class AddTextWindow(QWidget):
         self.close_btn.clicked.connect(self.close)
 
     def open_mainWindow(self):
-        self.w = MainWindow()
-        self.w.show()
-        self.w.show_main_window()
-        self.w.close()
+        self.main_window = MainWindow()
+        self.main_window.show()
+        self.main_window.show_main_window()
+        self.main_window.close()
 
     def add_words(self):
         create_words(self.text.toPlainText(), self.topic.toPlainText())
@@ -215,18 +216,18 @@ class WindowKeyboardTrainer(QMainWindow):
         self.full_time_value = QLabel(self)
         self.full_time_value.setGeometry(890, 300, 90, 41)
         self.full_time_value.setText("00:00:00")
-        self.symb = QLabel(self)
-        self.symb.setText("CPM:")
-        self.symb.setGeometry(750, 340, 150, 41)
-        self.symb1 = QLabel(self)
-        self.symb1.setGeometry(890, 340, 90, 41)
-        self.symb1.setText("00")
-        self.words = QLabel(self)
-        self.words.setGeometry(750, 380, 150, 41)
-        self.words.setText("WPM:")
-        self.words1 = QLabel(self)
-        self.words1.setGeometry(890, 380, 90, 41)
-        self.words1.setText("00")
+        self.CPM = QLabel(self)
+        self.CPM.setText("CPM:")
+        self.CPM.setGeometry(750, 340, 150, 41)
+        self.CPM_value = QLabel(self)
+        self.CPM_value.setGeometry(890, 340, 90, 41)
+        self.CPM_value.setText("00")
+        self.WPM = QLabel(self)
+        self.WPM.setGeometry(750, 380, 150, 41)
+        self.WPM.setText("WPM:")
+        self.WPM_value = QLabel(self)
+        self.WPM_value.setGeometry(890, 380, 90, 41)
+        self.WPM_value.setText("00")
 
     def start_session(self):
         self.user_text_box.setReadOnly(False)
@@ -253,10 +254,10 @@ class WindowKeyboardTrainer(QMainWindow):
         self.menu.clicked.connect(self.close)
 
     def switch_window(self):
-        self.w = MainWindow()
-        self.w.show()
-        self.w.show_main_window()
-        self.w.close()
+        self.main_window = MainWindow()
+        self.main_window.show()
+        self.main_window.show_main_window()
+        self.main_window.close()
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
@@ -309,7 +310,7 @@ class WindowKeyboardTrainer(QMainWindow):
 
     @pyqtSlot()
     def update_statistic(self):
-        self.symb1.setText(str(self.stat.statistic['WPM'].value))
+        self.CPM_value.setText(str(self.stat.statistic['WPM'].value))
 
     @pyqtSlot()
     def set_color(self, state_list):
