@@ -1,11 +1,11 @@
 import re
-import dictionary
+from modules import dictionary
 
 
 def multiple_replace(string_to_parse):
     replace_values = ['.', ',', '!', '?', ':', ';', '-']
     for i in replace_values:
-        string_to_parse = string_to_parse.replace(i, '')
+        string_to_parse = string_to_parse.replace(i, ' ')
     return string_to_parse
 
 

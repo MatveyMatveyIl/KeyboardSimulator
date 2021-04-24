@@ -1,5 +1,5 @@
 try:
-    from dictionary import sentences
+    from modules.dictionary import sentences
     import sys
     import random
     from modules import EXCEPTIONS, statistic
@@ -359,12 +359,3 @@ class WindowKeyboardTrainer(QMainWindow):
                         format.setBackground(brush)
                         cursor.mergeCharFormat(format)
             self.symbols_state = state_list
-
-
-app = QApplication(sys.argv)
-app.setStyleSheet(form_style.style)
-window = MainWindow()
-window.show()
-window.close()
-window.show_main_window()
-sys.exit(app.exec_())

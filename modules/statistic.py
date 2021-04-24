@@ -23,7 +23,7 @@ class WPM:
     def count_stat(self, time, text):
         multiple_replace(text)
         self.length += len(text.split(' '))
-        self.time += seconds_to_minutes(time)
+        self.time = seconds_to_minutes(time)
         self.value = self.length // self.time
 
 

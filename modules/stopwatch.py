@@ -1,5 +1,5 @@
 import sys
-import EXCEPTIONS
+from modules import EXCEPTIONS
 
 try:
     from PyQt5.QtCore import QTimer
