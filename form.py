@@ -344,19 +344,19 @@ class WindowKeyboardTrainer(QMainWindow):
             for char_text in range(len(state_list)):
                 if state_list[char_text][0] == 'correct':
                     cursor.setPosition(state_list[char_text][1])
-                    cursor.movePosition(cursor.Right, 100)
+                    cursor.movePosition(cursor.Right, 1)
                     format.setBackground(QBrush(QColor('#a6f5c8')))
                     cursor.mergeCharFormat(format)
                 elif state_list[char_text][0] == 'wrong':
                     cursor.setPosition(state_list[char_text][1])
-                    cursor.movePosition(cursor.Right, 100)
+                    cursor.movePosition(cursor.Right, 1)
                     format.setBackground(QBrush(QColor('#ff6e6e')))
                     cursor.mergeCharFormat(format)
             if len(state_list) <= len(self.symbols_state):
                 for white in range(0, len(self.symbols_state)):
                     if white >= len(state_list):
                         cursor.setPosition(self.symbols_state[white][1])
-                        cursor.movePosition(cursor.Right, 100)
+                        cursor.movePosition(cursor.Right, 1)
                         brush = QBrush(QColor('#E6E6FA'))
                         format.setBackground(brush)
                         cursor.mergeCharFormat(format)

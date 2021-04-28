@@ -60,7 +60,7 @@ QComboBox QAbstractItemView {
 QLabel {
     background: #D9A8FC;
     font: Arial;
-    font-size: 16px;
+    font-size: 13px;
     color:#000000;   
     qproperty-alignment: AlignCenter;
 
