@@ -253,11 +253,13 @@ class WindowKeyboardTrainer(QMainWindow):
         """End session handling"""
         self.level_box.setDisabled(False)
         self.user_text_box.setReadOnly(True)
-        self.user_text_box.clear()
+        if len(self.user_text_box.toPlainText()) != 0:
+            self.user_text_box.clear()
         self.text_to_write.setText('')
         self.stopwatch.do_finish()
         self.timer_label.setText('0:00.00')
         self.full_time_value.setText('0:00.00')
+        self.full_stopwatch.do_finish()
         self.full_stopwatch.time = 0
         self.start.setText('Старт')
 
