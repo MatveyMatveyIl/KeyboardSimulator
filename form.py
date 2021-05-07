@@ -225,13 +225,13 @@ class WindowKeyboardTrainer(QMainWindow):
         self.CPM.setGeometry(750, 340, 150, 41)
         self.CPM_value = QLabel(self)
         self.CPM_value.setGeometry(890, 340, 90, 41)
-        self.CPM_value.setText("00")
+        self.CPM_value.setText("0 сим/мин")
         self.WPM = QLabel(self)
         self.WPM.setGeometry(750, 380, 150, 41)
         self.WPM.setText("WPM:")
         self.WPM_value = QLabel(self)
         self.WPM_value.setGeometry(890, 380, 90, 41)
-        self.WPM_value.setText("00")
+        self.WPM_value.setText("0 слов/мин")
 
         self.errors = QLabel(self)
         self.errors.setGeometry(750, 420, 200, 41)
@@ -281,6 +281,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.full_stopwatch.do_finish()
         self.full_stopwatch.time = 0
         self.start.setText('Старт')
+        self.WPM_value.setText("0 слов/мин")
+        self.CPM_value.setText("0 сим/мин")
 
     def set_menubar_interface(self):
         self.menu = QPushButton(self)
@@ -363,8 +365,8 @@ class WindowKeyboardTrainer(QMainWindow):
 
     @pyqtSlot()
     def update_statistic(self):
-        self.CPM_value.setText(str(self.stat.statistic['CPM'].value) + 'сим/мин')
-        self.WPM_value.setText(str(self.stat.statistic['WPM'].value) + 'слов/мин')
+        self.CPM_value.setText(str(self.stat.statistic['CPM'].value) + ' сим/мин')
+        self.WPM_value.setText(str(self.stat.statistic['WPM'].value) + ' слов/мин')
         self.errors_value.setText(str(self.count_errors))
         self.errors1_value.setText(str(self.count1_errors))
 
@@ -386,11 +388,10 @@ class WindowKeyboardTrainer(QMainWindow):
                     format.setBackground(QBrush(QColor('#ff6e6e')))
                     cursor.mergeCharFormat(format)
             if len(state_list) <= len(self.symbols_state):
-                for white in range(0, len(self.symbols_state)):
-                    if white >= len(state_list):
-                        cursor.setPosition(self.symbols_state[white][1])
+                for i in range(0, len(self.symbols_state)):
+                    if i >= len(state_list):
+                        cursor.setPosition(self.symbols_state[i][1])
                         cursor.movePosition(cursor.Right, 1)
-                        brush = QBrush(QColor('#E6E6FA'))
-                        format.setBackground(brush)
+                        format.setBackground(QBrush(QColor('#E6E6FA')))
                         cursor.mergeCharFormat(format)
             self.symbols_state = state_list
