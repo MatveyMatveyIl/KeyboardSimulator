@@ -247,8 +247,6 @@ class WindowKeyboardTrainer(QMainWindow):
         self.errors1_value.setGeometry(890, 460, 90, 41)
         self.errors1_value.setText("0")
 
-
-
     def start_session(self):
         """Session start/pause handling"""
         if self.start.text() in {'Старт', 'Продолжить'}:
@@ -283,6 +281,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.start.setText('Старт')
         self.WPM_value.setText("0 слов/мин")
         self.CPM_value.setText("0 сим/мин")
+        self.errors_value.setText('0')
+        self.errors1_value.setText('0')
 
     def set_menubar_interface(self):
         self.menu = QPushButton(self)
