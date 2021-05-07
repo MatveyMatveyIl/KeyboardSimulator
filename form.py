@@ -207,6 +207,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.start.setGeometry(100, 320, 190, 71)
         self.start.setText("Старт")
         self.start.clicked.connect(self.start_session)
+        self.start.clicked.connect(self.user_text_box.setFocus)
         self.finish = QPushButton(self)
         self.finish.setGeometry(440, 320, 190, 71)
         self.finish.setText("Завершить")
@@ -281,9 +282,12 @@ class WindowKeyboardTrainer(QMainWindow):
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
             if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
                 if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
+                    self.stat.statistic['WPM'].length += \
+                        len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
                     self.equal_strings()
                     return True
         return False
+
 
     def equal_strings(self):
         self.user_text_box.clear()
@@ -310,8 +314,7 @@ class WindowKeyboardTrainer(QMainWindow):
                 else:
                     state_list.append(('wrong', position))
         self.set_color(state_list)
-        self.stat.process_data(self.full_time_value.text(), ' ',
-                               len(list(filter(lambda x: x[0] == 'wrong', self.symbols_state))))
+        self.stat.process_data(self.full_time_value.text(), self.user_text_box.toPlainText())
 
     @pyqtSlot()
     def update_time(self):
@@ -334,6 +337,7 @@ class WindowKeyboardTrainer(QMainWindow):
     @pyqtSlot()
     def update_statistic(self):
         self.CPM_value.setText(str(self.stat.statistic['CPM'].value) + 'сим/мин')
+        self.WPM_value.setText(str(self.stat.statistic['WPM'].value) + 'слов/мин')
 
     @pyqtSlot()
     def set_color(self, state_list):
