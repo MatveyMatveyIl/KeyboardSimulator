@@ -6,7 +6,8 @@ try:
     from modules import form_style
     from modules.stopwatch import *
     from modules.create_user_dict import *
-
+    import datetime
+    from data import *
 except Exception as e:
     print('Modules not found: "{}". Try reinstalling the app.'.format(e))
     sys.exit(4)
@@ -320,9 +321,14 @@ class WindowKeyboardTrainer(QMainWindow):
         """End session handling"""
         self.level_box.setDisabled(False)
         self.user_text_box.setReadOnly(True)
+        save_results(str(datetime.datetime.now()).split(' ')[0],
+                     self.stat.statistic['WPM'].value,
+                     self.stat.statistic['CPM'].value,
+                     int(self.errors_value.text()))
         if len(self.user_text_box.toPlainText()) != 0:
             self.user_text_box.clear()
         self.text_to_write.setText('')
+        self.stat.nullify_result()
         self.stopwatch.do_finish()
         self.timer_label.setText('0:00.00')
         self.full_time_value.setText('0:00.00')

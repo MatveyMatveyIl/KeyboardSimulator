@@ -1,23 +1,28 @@
 try:
     import sqlite3
     import sys
+    import datetime
 except Exception as e:
     print('Modules not found: "{}". Try reinstalling the app.'.format(e))
     sys.exit(4)
 
-db = sqlite3.connect('user.db')
-sql = db.cursor()
-sql.execute("""CREATE TABLE IF NOT EXISTS user_results(
-    datetime TEXT,
-    wpm BIGINT,
-    cpm BIGINT,
-    errors BIGINT
-)""")
-db.commit()
+
+def login():
+    global db
+    global sql
+    db = sqlite3.connect('user.db')
+    sql = db.cursor()
+    sql.execute("""CREATE TABLE IF NOT EXISTS user_results(
+        datetime TEXT,
+        wpm BIGINT,
+        cpm BIGINT,
+        errors BIGINT
+    )""")
+    db.commit()
 
 
 def save_results(date, new_wpm, new_cpm, new_errors):
-    sql.execute("SELECT datetime FROM user_results WHERE datetime = '{date}'")
+    sql.execute(f"SELECT datetime FROM user_results WHERE datetime = '{date}'")
     if sql.fetchone() is None:
         sql.execute("""INSERT INTO user_results VALUES (?, ?, ?, ?)""", (date, new_wpm, new_cpm, new_errors))
         db.commit()
@@ -29,7 +34,7 @@ def save_results(date, new_wpm, new_cpm, new_errors):
             sql.execute(f"UPDATE user_results SET cpm = {(old_cpm[0] + new_cpm) // 2} WHERE datetime = '{date}'")
             db.commit()
         for old_errors in sql.execute(f"SELECT errors FROM user_results WHERE datetime = '{date}'"):
-            sql.execute(f"UPDATE user_results SET errors = {(old_errors[0] + new_errors) // 2} WHERE datetime = '{date}'")
+            sql.execute(f"UPDATE user_results SET errors = {(old_errors[0] + new_errors)} WHERE datetime = '{date}'")
             db.commit()
 
 
@@ -40,7 +45,3 @@ def take_results():
 
     return results
 
-
-save_results('todo', 300, 300, 300)
-for result in sql.execute('SELECT * FROM user_results'):
-        print(result)

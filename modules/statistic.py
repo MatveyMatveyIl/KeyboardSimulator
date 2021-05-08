@@ -13,6 +13,13 @@ class Statistic:
         for stat in self.statistic.values():
             stat.count_stat(time, text)
 
+    def nullify_result(self):
+        for stat in self.statistic.values():
+            stat.length = 0
+            stat.value = 0
+            stat.time = 0
+        self.statistic['WPM'].count = 0
+
 
 class WPM:
     def __init__(self):
@@ -24,9 +31,8 @@ class WPM:
     def count_stat(self, time, text):
         multiple_replace(text)
         self.count = len(text.split(' ')) - 1
-        self.time = seconds_to_minutes(time)
-        if self.time != 0:
-            self.value = (self.length + self.count) // self.time
+        self.time = seconds_to_minutes(time) if seconds_to_minutes(time) != 0 else 1
+        self.value = (self.length + self.count) // self.time
 
 
 class CPM:
@@ -38,4 +44,4 @@ class CPM:
     def count_stat(self, time, text):
         self.length += 1
         self.time = seconds_to_minutes(time) if seconds_to_minutes(time) != 0 else 1
-        self.value = self.length // self.time if self.length // self.time > 0 else 0
+        self.value = self.length // self.time
