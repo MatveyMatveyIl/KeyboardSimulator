@@ -32,7 +32,7 @@ class MainWindow(QWidget):
         self.setFixedSize(380, 449)
         self.setWindowIcon(QIcon('pictures/ammIcon.png'))
         self.helper = QPushButton(self)
-        self.helper.setGeometry(50, 30, 261, 51) #задать чрезе фор с шагом +80 по второй координате
+        self.helper.setGeometry(50, 30, 261, 51)  # задать чрезе фор с шагом +80 по второй координате
         self.helper.setText("Помощь")
         self.user = QPushButton(self)
         self.user.setGeometry(50, 110, 261, 51)
@@ -281,7 +281,7 @@ class WindowKeyboardTrainer(QMainWindow):
 
     def sound(self):
         self.media_player = QMediaPlayer()
-        self.url = QUrl.fromLocalFile(QDir.toNativeSeparators("pictures\sound.mp3"))
+        self.url = QUrl.fromLocalFile(QDir.toNativeSeparators("pictures/sound.mp3"))
         self.content = QMediaContent(self.url)
         self.media_player.setMedia(self.content)
         self.media_player.setVolume(50)
