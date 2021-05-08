@@ -40,5 +40,7 @@ def take_results():
 
     return results
 
+
+save_results('todo', 300, 300, 300)
 for result in sql.execute('SELECT * FROM user_results'):
         print(result)
