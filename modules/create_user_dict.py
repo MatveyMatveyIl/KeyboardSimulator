@@ -16,15 +16,17 @@ def create_words(text, topic):
 
 def create_sentences(text, topic):
     dictionary.sentences[topic] = list(filter(lambda x: len(x) > 10,
-                       [x.strip() for x in re.split('\.|\?|!|\n', text)]))
+                                              [x.strip() for x in re.split('\.|\?|!|\n', text)]))
 
 
 def create_text(text, topic):
     dictionary.sentences[topic] = [text]
 
+
+
 # s = input()
 # print(create_sentences(s))
-#s = [x for x in input().split('\n')]
+# s = [x for x in input().split('\n')]
 # a = []
 # for i in open('text.txt'):
 #     if len(i) > 4:
@@ -34,4 +36,3 @@ def create_text(text, topic):
 
 # for i in a.split(','):
 #     print(i)
-

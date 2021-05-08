@@ -15,8 +15,10 @@ try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
         QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
         QMessageBox
-    from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush
-    from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp
+    from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion
+    from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp, QUrl, QDir
+    from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent
+
     import pyqtgraph as pg
 except Exception as e:
     print('PyQt5 not found: "{}".'.format(e))
@@ -164,6 +166,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.symbols_state = []
         self.count_errors = 0
         self.count1_errors = 0
+        self.dict_errors = []
 
     def set_user_interface(self):
         self.set_window_interface()
@@ -184,7 +187,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.user_text_box.setPlaceholderText("Выберите словарь, нажмите старт и начните ввод")
         self.user_text_box.installEventFilter(self)
         self.user_text_box.textChanged.connect(self.check_errors)
-        #self.user_text_box.textChanged.connect(self.update_statistic)
+        # self.user_text_box.textChanged.connect(self.update_statistic)
         self.user_text_box.setReadOnly(True)
 
     def set_text_to_write_interface(self):
@@ -199,6 +202,35 @@ class WindowKeyboardTrainer(QMainWindow):
         self.level_box.setGeometry(780, 120, 200, 60)
         for topic in dictionary.sentences.keys():
             self.level_box.addItem(topic)
+
+        self.level2_box = QComboBox(self)
+        self.level2_box.setGeometry(780, 220, 200, 60)
+        self.level2_box.addItem("Режим1")
+        self.level2_box.addItem("Режим2")
+        self.level2_box.addItem("Работа над ошибками")
+        self.level2_box.activated[str].connect(self.tt)
+        self.sound_button = QPushButton(self)
+        self.sound_button.setGeometry(780, 20, 35, 35)
+        self.sound_button.clicked.connect(self.sound)
+        self.sound_button.setIcon(QIcon("pictures/звук2.png"))
+        self.sound_button.setStyleSheet('''QPushButton {
+                                    background: white;
+                                    border: 1px solid black;
+                                    border-radius: 10px;
+                                    border-width: 2px;
+                                    font: bold 14px;
+                              }''')
+
+    def sound_b(self):
+        self.sound_button.setIcon(QIcon("pictures/звук2.png"))
+        self.sound_button.clicked.connect(self.sound)
+        self.media_player.stop()
+
+    def tt(self):
+        if self.level2_box.currentText() == "Работа над ошибками":
+            self.level_box.setDisabled(True)
+        else:
+            self.level_box.setDisabled(False)
 
     def set_stopwatch_interface(self):
         self.stopwatch = StopWatch()
@@ -247,6 +279,16 @@ class WindowKeyboardTrainer(QMainWindow):
         self.errors1_value.setGeometry(890, 460, 90, 41)
         self.errors1_value.setText("0")
 
+    def sound(self):
+        self.media_player = QMediaPlayer()
+        self.url = QUrl.fromLocalFile(QDir.toNativeSeparators("pictures\sound.mp3"))
+        self.content = QMediaContent(self.url)
+        self.media_player.setMedia(self.content)
+        self.media_player.setVolume(50)
+        self.media_player.play()
+        self.sound_button.setIcon(QIcon("pictures/звук1.png"))
+        self.sound_button.clicked.connect(self.sound_b)
+
     def start_session(self):
         """Session start/pause handling"""
         if self.start.text() in {'Старт', 'Продолжить'}:
@@ -257,8 +299,13 @@ class WindowKeyboardTrainer(QMainWindow):
                 self.full_stopwatch.do_start()
             if len(self.text_to_write.toPlainText()) == 0:
                 self.text_to_write.setText(random.choice(sentences[self.level_box.currentText()]))
+            if self.level2_box.currentText() == "Работа над ошибками":
+                self.text_to_write.setText("")
+                self.user_text_box.setText("")
+                self.text_to_write.setText(random.choice(sentences['ошибки']))
             self.user_text_box.textChanged.connect(self.update_time)
             self.start.setText('Пауза')
+
         else:
             self.user_text_box.setReadOnly(True)
             self.level_box.setDisabled(False)
@@ -301,14 +348,22 @@ class WindowKeyboardTrainer(QMainWindow):
         """Check input if pressed key is Enter"""
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
             if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
-                if self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
+                if self.user_text_box.toPlainText() == self.text_to_write.toPlainText() \
+                        and self.level2_box.currentText() == "Режим1":
                     self.stat.statistic['WPM'].length += \
                         len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
                     self.equal_strings()
                     self.count1_errors = 0
-                    return True
+                if self.level2_box.currentText() == "Режим2":
+                    self.stat.statistic['WPM'].length += \
+                        len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
+                    self.equal_strings()
+                    self.count1_errors = 0
+                if self.level2_box.currentText() == "Работа над ошибками" and self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
+                    self.for_work_errors()
+                    self.count1_errors = 0
+                return True
         return False
-
 
     def equal_strings(self):
         self.user_text_box.clear()
@@ -324,11 +379,24 @@ class WindowKeyboardTrainer(QMainWindow):
         except StopIteration:
             QMessageBox.information(self, "Вы закончили", 'поздравляем', QMessageBox.Ok)
 
+    def for_work_errors(self):
+        self.user_text_box.clear()
+        self.stopwatch.do_finish()
+        self.full_stopwatch.do_pause()
+        self.symbols_state = []
+        self.timer_label.setText('0:00.00')
+        if self.text_to_write.toPlainText() in self.dict_errors:
+            self.dict_errors.remove(self.text_to_write.toPlainText())
+            sentences['ошибки'] = self.dict_errors
+        if len(self.dict_errors) > 0:
+            self.text_to_write.setText(random.choice(sentences['ошибки']))
+        else:
+            QMessageBox.information(self, "Вы закончили", 'поздравляем', QMessageBox.Ok)
+
     @pyqtSlot()
     def check_errors(self):
         """Checks the entered text and compares errors with the original"""
         state_list = []
-
         if len(self.text_to_write.toPlainText()) >= len(self.user_text_box.toPlainText()):
             for position in range(len(self.user_text_box.toPlainText())):
                 if self.user_text_box.toPlainText()[position] == self.text_to_write.toPlainText()[position]:
@@ -341,9 +409,32 @@ class WindowKeyboardTrainer(QMainWindow):
             if self.symbols_state[-1][0] == "wrong":
                 self.count_errors += 1
                 self.count1_errors += 1
+                if self.text_to_write.toPlainText() not in self.dict_errors:
+                    if self.text_to_write.toPlainText().find(" ") != -1:
+                        index = state_list[-1][1]
+                        index1 = 0
+                        index2 = 0
+                        if self.text_to_write.toPlainText()[index] != ',' or ' ' or '-':
+                            a = self.text_to_write.toPlainText().replace(',', '')
+                            for i in range(0, len(self.text_to_write.toPlainText())):
+                                if a[index - i] == ' ':
+                                    index1 = index - i
+                                    break
+
+                            for x in range(0, len(self.text_to_write.toPlainText())):
+                                if a[index + x] == ' ':
+                                    index2 = index + x
+                                    break
+                            if a[index1:index2].strip() not in self.dict_errors:
+                                if index1 < 0:
+                                    index1 = 0
+                                self.dict_errors.append(a[index1:index2].strip())
+                                self.dict_errors.remove("")
+                    else:
+                        self.dict_errors.append(self.text_to_write.toPlainText())
+                dictionary.sentences["ошибки"] = self.dict_errors
         except:
             IndexError
-
 
     @pyqtSlot()
     def update_time(self):
@@ -352,7 +443,6 @@ class WindowKeyboardTrainer(QMainWindow):
         self.full_stopwatch.do_start()
         self.stopwatch.timer.timeout.connect(self.print_time)
         self.full_stopwatch.timer.timeout.connect(self.update_statistic)
-
 
     @pyqtSlot()
     def print_time(self):
