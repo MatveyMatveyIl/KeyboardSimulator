@@ -17,7 +17,7 @@ db.commit()
 
 
 def save_results(date, new_wpm, new_cpm, new_errors):
-    sql.execute("SELECT datetime FROM user_results")
+    sql.execute("SELECT datetime FROM user_results WHERE datetime = '{date}'")
     if sql.fetchone() is None:
         sql.execute("""INSERT INTO user_results VALUES (?, ?, ?, ?)""", (date, new_wpm, new_cpm, new_errors))
         db.commit()
@@ -40,6 +40,5 @@ def take_results():
 
     return results
 
-save_results('t', 1, 1, 1)
 for result in sql.execute('SELECT * FROM user_results'):
         print(result)
