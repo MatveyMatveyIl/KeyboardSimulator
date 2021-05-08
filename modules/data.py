@@ -39,3 +39,7 @@ def take_results():
         results.append(result)
 
     return results
+
+save_results('t', 1, 1, 1)
+for result in sql.execute('SELECT * FROM user_results'):
+        print(result)

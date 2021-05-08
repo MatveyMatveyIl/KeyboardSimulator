@@ -30,7 +30,7 @@ class MainWindow(QWidget):
         super(MainWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(380, 449)
-        self.setWindowIcon(QIcon('pictures/ammIcon.png'))
+        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
         self.helper = QPushButton(self)
         self.helper.setGeometry(50, 30, 261, 51)  # задать чрезе фор с шагом +80 по второй координате
         self.helper.setText("Помощь")
