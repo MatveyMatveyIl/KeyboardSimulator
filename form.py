@@ -29,85 +29,45 @@ class MainWindow(QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
-        self.setFixedSize(380, 449)
+        self.setFixedSize(380, 450)
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
-        self.helper = QPushButton(self)
-        self.helper.setGeometry(50, 30, 261, 51)  # задать чрезе фор с шагом +80 по второй координате
-        self.helper.setText("Помощь")
-        self.user = QPushButton(self)
-        self.user.setGeometry(50, 110, 261, 51)
-        self.user.setText("Пользователь")
-        self.add_text = QPushButton(self)
-        self.add_text.setGeometry(50, 190, 261, 51)
-        self.add_text.setText("Добавить текст")
-        self.stat = QPushButton(self)
-        self.stat.setGeometry(50, 270, 261, 51)
-        self.stat.setText("Статистика")
-        self.button = QPushButton(self)
-        self.button.setGeometry(50, 350, 261, 51)
-        self.button.setText("Начать")
         self.stat1 = Stat.Stat
+        buttons_name = ['Помощь', 'Пользователь', 'Статистика', 'Добавить текст', 'Старт']
+        buttons = []
+        for i, name in enumerate(buttons_name):
+            button = QPushButton(self)
+            button.setGeometry(50, 30 + 80 * i, 260, 50)
+            button.setText(name)
+            buttons.append(button)
+        self.helper = buttons[0]
+        self.user = buttons[1]
+        self.stat = buttons[2]
+        self.add_text = buttons[3]
+        self.button_start = buttons[4]
 
     def show_main_window(self):
+        windows = {'keyboard': WindowKeyboardTrainer(), 'add_text': AddTextWindow()}
         self.main_window = MainWindow()
-        self.main_window.button.clicked.connect(self.show_window_keyboard)
-        self.main_window.button.clicked.connect(self.main_window.close)
-        self.main_window.user.clicked.connect(self.show_user_interface)
-        self.main_window.user.clicked.connect(self.main_window.close)
-        self.main_window.add_text.clicked.connect(self.show_add_text)
+        self.main_window.button_start.clicked.connect(lambda: self.show_window(windows['keyboard']))
+        self.main_window.button_start.clicked.connect(self.main_window.close)
+        self.main_window.add_text.clicked.connect(lambda: self.show_window(windows['add_text']))
         self.main_window.add_text.clicked.connect(self.main_window.close)
         self.main_window.stat.clicked.connect(self.show_stat)
         self.main_window.show()
 
-    def show_window_keyboard(self):
-        self.window_trainer = WindowKeyboardTrainer()
-        self.window_trainer.show()
-
-    def show_user_interface(self):
-        self.user_window = UserWindow()
-        self.user_window.show()
-
-    def show_add_text(self):
-        self.dict_window = AddTextWindow()
-        self.dict_window.show()
-
     def show_stat(self):
         self.stat1.showed(self)
 
-
-class UserWindow(QWidget):
-    def __init__(self):
-        super(UserWindow, self).__init__()
-        self.setWindowTitle('Keyboard simulator')
-        self.setFixedSize(330, 390)
-        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
-        self.login = QTextEdit(self)
-        self.login.setGeometry(30, 20, 261, 51)
-        self.login.setPlaceholderText("Введите имя")
-        self.add = QPushButton(self)
-        self.add.setGeometry(30, 90, 261, 51)
-        self.add.setText("Войти")
-        self.save = QPushButton(self)
-        self.save.setGeometry(30, 140, 261, 51)
-        self.save.setText("Создать")
-        self.exit = QPushButton(self)
-        self.exit.setGeometry(30, 300, 261, 51)
-        self.exit.setText("Назад")
-        self.exit.clicked.connect(self.show_main_window)
-        self.exit.clicked.connect(self.close)
-
-    def show_main_window(self):
-        self.main_window = MainWindow()
-        self.main_window.show()
-        self.main_window.show_main_window()
-        self.main_window.close()
+    def show_window(self, name):
+        self.window = name
+        self.window.show()
 
 
 class AddTextWindow(QWidget):
     def __init__(self):
         super(AddTextWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
-        self.setFixedSize(967, 465)
+        self.setFixedSize(970, 465)
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
         self.topic = QTextEdit(self)
         self.topic.setGeometry(305, 30, 331, 51)
@@ -116,21 +76,20 @@ class AddTextWindow(QWidget):
         self.text.setGeometry(45, 130, 871, 251)
         self.text.setPlaceholderText(
             "Вставьте текст. Слова должны состоять как минимум из 3 символов, предложения из 10")
-        self.word = QPushButton(self)
-        self.word.setGeometry(80, 410, 150, 41)
-        self.word.setText("Слова")
-        self.sentences = QPushButton(self)
-        self.sentences.setGeometry(280, 410, 150, 41)
-        self.sentences.setText("Предложения")
-        self.label = QPushButton(self)
-        self.label.setGeometry(480, 410, 150, 41)
-        self.label.setText("Текст")
-        self.close_btn = QPushButton(self)
-        self.close_btn.setGeometry(680, 410, 150, 41)
-        self.close_btn.setText('Назад')
-        self.word.clicked.connect(self.add_words)
-        self.sentences.clicked.connect(self.add_sentences)
-        self.label.clicked.connect(self.add_text)
+        buttons_name = ['Слова', 'Предложения', 'Текст', 'Назад']
+        buttons = []
+        for i, name in enumerate(buttons_name):
+            button = QPushButton(self)
+            button.setGeometry(80 + i * 200, 410, 150, 40)
+            button.setText(name)
+            buttons.append(button)
+        self.word_btn = buttons[0]
+        self.sentences_btn = buttons[1]
+        self.text_btn = buttons[2]
+        self.close_btn = buttons[3]
+        self.word_btn.clicked.connect(self.add_words)
+        self.sentences_btn.clicked.connect(self.add_sentences)
+        self.text_btn.clicked.connect(self.add_text)
         self.close_btn.clicked.connect(self.open_mainWindow)
         self.close_btn.clicked.connect(self.close)
 
@@ -191,7 +150,6 @@ class WindowKeyboardTrainer(QMainWindow):
         self.user_text_box.setPlaceholderText("Выберите словарь, нажмите старт и начните ввод")
         self.user_text_box.installEventFilter(self)
         self.user_text_box.textChanged.connect(self.check_errors)
-        # self.user_text_box.textChanged.connect(self.update_statistic)
         self.user_text_box.setReadOnly(True)
 
     def set_text_to_write_interface(self):
@@ -207,15 +165,16 @@ class WindowKeyboardTrainer(QMainWindow):
         for topic in dictionary.sentences.keys():
             self.level_box.addItem(topic)
 
-        self.level2_box = QComboBox(self)
-        self.level2_box.setGeometry(780, 220, 200, 60)
-        self.level2_box.addItem("Режим1")
-        self.level2_box.addItem("Режим2")
-        self.level2_box.addItem("Работа над ошибками")
-        self.level2_box.activated[str].connect(self.tt)
+        self.level_mode = QComboBox(self)
+        self.level_mode.setGeometry(780, 220, 200, 60)
+        self.level_mode.addItem("С ошибками")
+        self.level_mode.addItem("Без ошибок")
+        self.level_mode.addItem("Работа над ошибками")
+        self.level_mode.activated[str].connect(self.block_change)
+        
         self.sound_button = QPushButton(self)
         self.sound_button.setGeometry(780, 20, 35, 35)
-        self.sound_button.clicked.connect(self.sound)
+        self.sound_button.clicked.connect(self.sound_on)
         self.sound_button.setIcon(QIcon("pictures/звук2.png"))
         self.sound_button.setStyleSheet('''QPushButton {
                                     background: white;
@@ -225,13 +184,23 @@ class WindowKeyboardTrainer(QMainWindow):
                                     font: bold 14px;
                               }''')
 
-    def sound_b(self):
+    def sound_off(self):
         self.sound_button.setIcon(QIcon("pictures/звук2.png"))
-        self.sound_button.clicked.connect(self.sound)
+        self.sound_button.clicked.connect(self.sound_on)
         self.media_player.stop()
 
-    def tt(self):
-        if self.level2_box.currentText() == "Работа над ошибками":
+    def sound_on(self):
+        self.media_player = QMediaPlayer()
+        self.url = QUrl.fromLocalFile(QDir.toNativeSeparators("pictures/sound.mp3"))
+        self.content = QMediaContent(self.url)
+        self.media_player.setMedia(self.content)
+        self.media_player.setVolume(50)
+        self.media_player.play()
+        self.sound_button.setIcon(QIcon("pictures/звук1.png"))
+        self.sound_button.clicked.connect(self.sound_off)
+
+    def block_change(self):
+        if self.level_mode.currentText() == "Работа над ошибками":
             self.level_box.setDisabled(True)
         else:
             self.level_box.setDisabled(False)
@@ -283,15 +252,6 @@ class WindowKeyboardTrainer(QMainWindow):
         self.errors1_value.setGeometry(890, 460, 90, 41)
         self.errors1_value.setText("0")
 
-    def sound(self):
-        self.media_player = QMediaPlayer()
-        self.url = QUrl.fromLocalFile(QDir.toNativeSeparators("pictures/sound.mp3"))
-        self.content = QMediaContent(self.url)
-        self.media_player.setMedia(self.content)
-        self.media_player.setVolume(50)
-        self.media_player.play()
-        self.sound_button.setIcon(QIcon("pictures/звук1.png"))
-        self.sound_button.clicked.connect(self.sound_b)
 
     def start_session(self):
         """Session start/pause handling"""
@@ -303,7 +263,7 @@ class WindowKeyboardTrainer(QMainWindow):
                 self.full_stopwatch.do_start()
             if len(self.text_to_write.toPlainText()) == 0:
                 self.text_to_write.setText(random.choice(sentences[self.level_box.currentText()]))
-            if self.level2_box.currentText() == "Работа над ошибками":
+            if self.level_mode.currentText() == "Работа над ошибками":
                 self.text_to_write.setText("")
                 self.user_text_box.setText("")
                 if len(self.dict_errors) == 0:
@@ -341,6 +301,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.WPM_value.setText("0 слов/мин")
         self.CPM_value.setText("0 сим/мин")
         self.errors_value.setText('0')
+        self.count_errors = 0
+        self.count1_errors = 0
         self.errors1_value.setText('0')
 
     def set_menubar_interface(self):
@@ -361,17 +323,17 @@ class WindowKeyboardTrainer(QMainWindow):
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
             if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
                 if self.user_text_box.toPlainText() == self.text_to_write.toPlainText() \
-                        and self.level2_box.currentText() == "Режим1":
+                        and self.level_mode.currentText() == "Режим1":
                     self.stat.statistic['WPM'].length += \
                         len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
                     self.equal_strings()
                     self.count1_errors = 0
-                if self.level2_box.currentText() == "Режим2":
+                if self.level_mode.currentText() == "Режим2":
                     self.stat.statistic['WPM'].length += \
                         len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
                     self.equal_strings()
                     self.count1_errors = 0
-                if self.level2_box.currentText() == "Работа над ошибками" \
+                if self.level_mode.currentText() == "Работа над ошибками" \
                         and self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
                     self.for_work_errors()
                     self.count1_errors = 0
