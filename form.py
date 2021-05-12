@@ -8,7 +8,8 @@ try:
     from modules.create_user_dict import *
     import datetime
     from data import *
-    from modules.Stat import print_graph_statistic
+    import matplotlib.pyplot as plt
+    import numpy as np
 except Exception as e:
     print('Modules not found: "{}". Try reinstalling the app.'.format(e))
     sys.exit(4)
@@ -53,6 +54,7 @@ class MainWindow(QWidget):
         self.main_window.add_text.clicked.connect(self.main_window.close)
         self.main_window.stat.clicked.connect(statistic.print_graph_statistic)
         self.main_window.show()
+
 
     def show_window(self, name):
         self.window = name
@@ -179,6 +181,29 @@ class WindowKeyboardTrainer(QMainWindow):
                                     border-width: 2px;
                                     font: bold 14px;
                               }''')
+        self.level_sound = QComboBox(self)
+        self.level_sound.setGeometry(830, 20, 150, 60)
+        self.level_sound.addItem("AC/DC")
+        self.level_sound.addItem("Antonio Vivaldi")
+        self.level_sound.addItem("Gorillaz")
+        self.level_sound.activated[str].connect(self.check_level_sound)
+
+    def check_level_sound(self):
+        if self.level_sound.currentText() == "AC/DC":
+            self.sound_play("pictures/sound3.mp3")
+        if self.level_sound.currentText() == "Antonio Vivaldi":
+            self.sound_play("pictures/sound4.mp3")
+        if self.level_sound.currentText() == "Gorillaz":
+            self.sound_play("pictures/sound5.mp3")
+        self.sound_button.setIcon(QIcon("pictures/звук1.png"))
+        self.sound_button.clicked.connect(self.sound_off)
+
+    def sound_play(self, sound):
+        self.media_player = QMediaPlayer()
+        self.url = QUrl.fromLocalFile(QDir.toNativeSeparators(sound))
+        self.media_player.setMedia(QMediaContent(self.url))
+        self.media_player.setVolume(50)
+        self.media_player.play()
 
     def sound_off(self):
         self.sound_button.setIcon(QIcon("pictures/звук2.png"))
@@ -186,11 +211,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.media_player.stop()
 
     def sound_on(self):
-        self.media_player = QMediaPlayer()
-        self.url = QUrl.fromLocalFile(QDir.toNativeSeparators("pictures/sound.mp3"))
-        self.media_player.setMedia(QMediaContent(self.url))
-        self.media_player.setVolume(50)
         self.media_player.play()
+        self.media_player.setVolume(50)
         self.sound_button.setIcon(QIcon("pictures/звук1.png"))
         self.sound_button.clicked.connect(self.sound_off)
 
