@@ -32,7 +32,7 @@ class MainWindow(QWidget):
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(380, 450)
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
-        buttons_name = ['Помощь', 'Пользователь', 'Статистика', 'Добавить текст', 'Старт']
+        buttons_name = ['Помощь', 'Статистика', 'Добавить текст', 'Старт']
         buttons = []
         for i, name in enumerate(buttons_name):
             button = QPushButton(self)
@@ -40,10 +40,9 @@ class MainWindow(QWidget):
             button.setText(name)
             buttons.append(button)
         self.helper = buttons[0]
-        self.user = buttons[1]
-        self.stat = buttons[2]
-        self.add_text = buttons[3]
-        self.button_start = buttons[4]
+        self.stat = buttons[1]
+        self.add_text = buttons[2]
+        self.button_start = buttons[3]
 
     def show_main_window(self):
         windows = {'keyboard': WindowKeyboardTrainer(), 'add_text': AddTextWindow()}
@@ -68,10 +67,10 @@ class AddTextWindow(QWidget):
         self.setFixedSize(970, 465)
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
         self.topic = QTextEdit(self)
-        self.topic.setGeometry(305, 30, 331, 51)
+        self.topic.setGeometry(305, 30, 330, 50)
         self.topic.setPlaceholderText("Введите название")
         self.text = QTextEdit(self)
-        self.text.setGeometry(45, 130, 871, 251)
+        self.text.setGeometry(45, 130, 870, 250)
         self.text.setPlaceholderText(
             "Вставьте текст. Слова должны состоять как минимум из 3 символов, предложения из 10")
         buttons_name = ['Слова', 'Предложения', 'Текст', 'Назад']
@@ -125,8 +124,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.stat = statistic.Statistic()
         self.full_stopwatch = StopWatch()
         self.symbols_state = []
+        self.count_all_errors = 0
         self.count_errors = 0
-        self.count1_errors = 0
         self.dict_errors = []
 
     def set_user_interface(self):
@@ -235,47 +234,38 @@ class WindowKeyboardTrainer(QMainWindow):
         self.timer_label = QLabel(self)
         self.timer_label.setText('0:00.00')
         self.timer_label.setGeometry(330, 335, 75, 41)
-        self.start = QPushButton(self)
-        self.start.setGeometry(100, 320, 190, 71)
-        self.start.setText("Старт")
+        buttons_name = ['Старт', 'Завершить и сохранить']
+        buttons = []
+        for i, name in enumerate(buttons_name):
+            button = QPushButton(self)
+            button.setGeometry(100 + i * 320, 320, 190, 70)
+            button.setText(name)
+            buttons.append(button)
+        self.start = buttons[0]
+        self.finish = buttons[1]
         self.start.clicked.connect(self.start_session)
         self.start.clicked.connect(self.user_text_box.setFocus)
-        self.finish = QPushButton(self)
-        self.finish.setGeometry(440, 320, 190, 71)
-        self.finish.setText("Завершить")
         self.finish.clicked.connect(self.end_session)
-        self.full_time_label = QLabel(self)
-        self.full_time_label.setText("Время сеанса:")
-        self.full_time_label.setGeometry(750, 300, 150, 41)
-        self.full_time_value = QLabel(self)
-        self.full_time_value.setGeometry(890, 300, 90, 41)
-        self.full_time_value.setText("00:00:00")
-        self.CPM = QLabel(self)
-        self.CPM.setText("CPM:")
-        self.CPM.setGeometry(750, 340, 150, 41)
-        self.CPM_value = QLabel(self)
-        self.CPM_value.setGeometry(890, 340, 90, 41)
-        self.CPM_value.setText("0 сим/мин")
-        self.WPM = QLabel(self)
-        self.WPM.setGeometry(750, 380, 150, 41)
-        self.WPM.setText("WPM:")
-        self.WPM_value = QLabel(self)
-        self.WPM_value.setGeometry(890, 380, 90, 41)
-        self.WPM_value.setText("0 слов/мин")
-
-        self.errors = QLabel(self)
-        self.errors.setGeometry(750, 420, 200, 41)
-        self.errors.setText("Количество ошибок за сеанс:")
-        self.errors_value = QLabel(self)
-        self.errors_value.setGeometry(940, 420, 40, 41)
-        self.errors_value.setText("0")
-
-        self.errors1 = QLabel(self)
-        self.errors1.setGeometry(750, 460, 150, 41)
-        self.errors1.setText("Количество ошибок:")
-        self.errors1_value = QLabel(self)
-        self.errors1_value.setGeometry(890, 460, 90, 41)
-        self.errors1_value.setText("0")
+        label_names = [('Время сеанса:', '00:00:00'), ('CPM:', '0 сим/мин'),
+                       ('WPM:', '0 слов/мин'), ('Количество ошибок за сеанс:', '0'), ('Количество ошибок:', '0')]
+        labels = []
+        for i, name in enumerate(label_names):
+            label = QLabel(self)
+            label_value = QLabel(self)
+            if name == 'Количество ошибок за сеанс:':
+                label.setGeometry(750, 300 + 40 * i, 200, 40)
+                label_value.setGeometry(940, 300 + 40 * i, 40, 40)
+            else:
+                label.setGeometry(750, 300 + 40 * i, 150, 40)
+                label_value.setGeometry(890, 300 + 40 * i, 90, 40)
+            label.setText(name[0])
+            label_value.setText(name[1])
+            labels.append((label, label_value))
+        self.full_time_label, self.full_time_value = labels[0][0], labels[0][1]
+        self.CPM, self.CPM_value = labels[1][0], labels[1][1]
+        self.WPM, self.WPM_value = labels[2][0], labels[2][1]
+        self.errors, self.errors_value = labels[3][0], labels[3][1]
+        self.errors1, self.errors1_value = labels[4][0], labels[4][1]
 
 
     def start_session(self):
@@ -326,8 +316,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.WPM_value.setText("0 слов/мин")
         self.CPM_value.setText("0 сим/мин")
         self.errors_value.setText('0')
+        self.count_all_errors = 0
         self.count_errors = 0
-        self.count1_errors = 0
         self.errors1_value.setText('0')
 
     def set_menubar_interface(self):
@@ -352,16 +342,16 @@ class WindowKeyboardTrainer(QMainWindow):
                     self.stat.statistic['WPM'].length += \
                         len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
                     self.equal_strings()
-                    self.count1_errors = 0
+                    self.count_errors = 0
                 if self.level_mode.currentText() == "Без ошибок":
                     self.stat.statistic['WPM'].length += \
                         len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
                     self.equal_strings()
-                    self.count1_errors = 0
+                    self.count_errors = 0
                 if self.level_mode.currentText() == "Работа над ошибками" \
                         and self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
                     self.for_work_errors()
-                    self.count1_errors = 0
+                    self.count_errors = 0
                 return True
         return False
 
@@ -369,9 +359,6 @@ class WindowKeyboardTrainer(QMainWindow):
         self.user_text_box.clear()
         self.stopwatch.do_finish()
         self.full_stopwatch.do_pause()
-        # self.stat.process_data(
-        #     self.timer_label.text(),
-        #     self.text_to_write.toPlainText())
         self.symbols_state = []
         self.timer_label.setText('0:00.00')
         try:
@@ -407,8 +394,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.stat.process_data(self.full_time_value.text(), self.user_text_box.toPlainText())
         try:
             if self.symbols_state[-1][0] == "wrong":
+                self.count_all_errors += 1
                 self.count_errors += 1
-                self.count1_errors += 1
                 if self.text_to_write.toPlainText() not in self.dict_errors:
                     if self.text_to_write.toPlainText().find(" ") != -1:
                         index = state_list[-1][1]
@@ -456,8 +443,8 @@ class WindowKeyboardTrainer(QMainWindow):
     def update_statistic(self):
         self.CPM_value.setText(str(self.stat.statistic['CPM'].value) + ' сим/мин')
         self.WPM_value.setText(str(self.stat.statistic['WPM'].value) + ' слов/мин')
-        self.errors_value.setText(str(self.count_errors))
-        self.errors1_value.setText(str(self.count1_errors))
+        self.errors_value.setText(str(self.count_all_errors))
+        self.errors1_value.setText(str(self.count_errors))
 
     @pyqtSlot()
     def set_color(self, state_list):
