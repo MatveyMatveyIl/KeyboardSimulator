@@ -8,7 +8,8 @@ try:
     from modules.create_user_dict import *
     import datetime
     from data import *
-    import Stat
+    import matplotlib.pyplot as plt
+    import numpy as np
 except Exception as e:
     print('Modules not found: "{}". Try reinstalling the app.'.format(e))
     sys.exit(4)
@@ -31,7 +32,6 @@ class MainWindow(QWidget):
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(380, 450)
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
-        self.stat1 = Stat.Stat
         buttons_name = ['Помощь', 'Пользователь', 'Статистика', 'Добавить текст', 'Старт']
         buttons = []
         for i, name in enumerate(buttons_name):
@@ -52,15 +52,44 @@ class MainWindow(QWidget):
         self.main_window.button_start.clicked.connect(self.main_window.close)
         self.main_window.add_text.clicked.connect(lambda: self.show_window(windows['add_text']))
         self.main_window.add_text.clicked.connect(self.main_window.close)
-        self.main_window.stat.clicked.connect(self.show_stat)
+        self.main_window.stat.clicked.connect(self.stat1)
         self.main_window.show()
 
-    def show_stat(self):
-        self.stat1.showed(self)
 
     def show_window(self, name):
         self.window = name
         self.window.show()
+
+    def stat1(self):
+        date = []
+        wpm = []
+        cpm = []
+        errors = []
+        for i in range(0, len(take_results())):
+            date.append(take_results()[i][0])
+            wpm.append(take_results()[i][1])
+            cpm.append(take_results()[i][2])
+            errors.append(take_results()[i][3])
+        self.x = np.array(date)
+        self.y = np.array(wpm)
+        self.y1 = np.array(cpm)
+        self.y2 = np.array(errors)
+        plt.figure(figsize= (17, 7))
+        man = plt.get_current_fig_manager()
+        man.canvas.set_window_title("Статистика")
+        plt.subplot(221)
+        plt.plot(self.x, self.y, '-', marker="o", c="g")
+        plt.title("Wpm")
+        plt.grid()
+        plt.subplot(222)
+        plt.plot(self.x, self.y1, '-.',  marker="o", c="b")
+        plt.title("Cpm")
+        plt.grid()
+        plt.subplot(223)
+        plt.plot(self.x, self.y2, '--', marker="o", c="r")
+        plt.title("Ошибки")
+        plt.grid()
+        plt.show()
 
 
 class AddTextWindow(QWidget):
@@ -192,8 +221,7 @@ class WindowKeyboardTrainer(QMainWindow):
     def sound_on(self):
         self.media_player = QMediaPlayer()
         self.url = QUrl.fromLocalFile(QDir.toNativeSeparators("pictures/sound.mp3"))
-        self.content = QMediaContent(self.url)
-        self.media_player.setMedia(self.content)
+        self.media_player.setMedia(QMediaContent(self.url))
         self.media_player.setVolume(50)
         self.media_player.play()
         self.sound_button.setIcon(QIcon("pictures/звук1.png"))
@@ -323,12 +351,12 @@ class WindowKeyboardTrainer(QMainWindow):
         if event.type() == QEvent.KeyPress and obj is self.user_text_box:
             if event.key() == Qt.Key_Return and self.user_text_box.hasFocus():
                 if self.user_text_box.toPlainText() == self.text_to_write.toPlainText() \
-                        and self.level_mode.currentText() == "Режим1":
+                        and self.level_mode.currentText() == "С ошибками":
                     self.stat.statistic['WPM'].length += \
                         len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
                     self.equal_strings()
                     self.count1_errors = 0
-                if self.level_mode.currentText() == "Режим2":
+                if self.level_mode.currentText() == "Без ошибок":
                     self.stat.statistic['WPM'].length += \
                         len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
                     self.equal_strings()
