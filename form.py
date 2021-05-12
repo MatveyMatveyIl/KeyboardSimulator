@@ -8,6 +8,7 @@ try:
     from modules.create_user_dict import *
     import datetime
     from data import *
+    import Stat
 except Exception as e:
     print('Modules not found: "{}". Try reinstalling the app.'.format(e))
     sys.exit(4)
@@ -19,8 +20,6 @@ try:
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion
     from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp, QUrl, QDir
     from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent
-
-    import pyqtgraph as pg
 except Exception as e:
     print('PyQt5 not found: "{}".'.format(e))
     sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
@@ -47,6 +46,7 @@ class MainWindow(QWidget):
         self.button = QPushButton(self)
         self.button.setGeometry(50, 350, 261, 51)
         self.button.setText("Начать")
+        self.stat1 = Stat.Stat
 
     def show_main_window(self):
         self.main_window = MainWindow()
@@ -56,7 +56,7 @@ class MainWindow(QWidget):
         self.main_window.user.clicked.connect(self.main_window.close)
         self.main_window.add_text.clicked.connect(self.show_add_text)
         self.main_window.add_text.clicked.connect(self.main_window.close)
-        # self.main_window.stat.clicked.connect(self.show_stat)
+        self.main_window.stat.clicked.connect(self.show_stat)
         self.main_window.show()
 
     def show_window_keyboard(self):
@@ -70,6 +70,9 @@ class MainWindow(QWidget):
     def show_add_text(self):
         self.dict_window = AddTextWindow()
         self.dict_window.show()
+
+    def show_stat(self):
+        self.stat1.showed(self)
 
 
 class UserWindow(QWidget):
