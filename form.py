@@ -8,7 +8,9 @@ try:
     from modules.create_user_dict import *
     import datetime
     from data import *
-    import Stat
+    import matplotlib.pyplot as plt
+    import numpy as np
+
 except Exception as e:
     print('Modules not found: "{}". Try reinstalling the app.'.format(e))
     sys.exit(4)
@@ -46,7 +48,38 @@ class MainWindow(QWidget):
         self.button = QPushButton(self)
         self.button.setGeometry(50, 350, 261, 51)
         self.button.setText("Начать")
-        self.stat1 = Stat.Stat
+
+    def stat1(self):
+        date = []
+        wpm = []
+        cpm = []
+        errors = []
+        for i in range(0, len(take_results())):
+            date.append(take_results()[i][0])
+            wpm.append(take_results()[i][1])
+            cpm.append(take_results()[i][2])
+            errors.append(take_results()[i][3])
+        self.x = np.array(date)
+        self.y = np.array(wpm)
+        self.y1 = np.array(cpm)
+        self.y2 = np.array(errors)
+        plt.figure(figsize= (17, 7))
+        man = plt.get_current_fig_manager()
+        man.canvas.set_window_title("Статистика")
+        plt.subplot(221)
+        plt.plot(self.x, self.y, '-', marker="o", c="g")
+        plt.title("Wpm")
+        plt.grid()
+        plt.subplot(222)
+        plt.plot(self.x, self.y1, '-.',  marker="o", c="b")
+        plt.title("Cpm")
+        plt.grid()
+        plt.subplot(223)
+        plt.plot(self.x, self.y2, '--', marker="o", c="r")
+        plt.title("Ошибки")
+        plt.grid()
+        plt.show()
+
 
     def show_main_window(self):
         self.main_window = MainWindow()
@@ -56,7 +89,7 @@ class MainWindow(QWidget):
         self.main_window.user.clicked.connect(self.main_window.close)
         self.main_window.add_text.clicked.connect(self.show_add_text)
         self.main_window.add_text.clicked.connect(self.main_window.close)
-        self.main_window.stat.clicked.connect(self.show_stat)
+        self.main_window.stat.clicked.connect(self.stat1)
         self.main_window.show()
 
     def show_window_keyboard(self):
@@ -71,8 +104,6 @@ class MainWindow(QWidget):
         self.dict_window = AddTextWindow()
         self.dict_window.show()
 
-    def show_stat(self):
-        self.stat1.showed(self)
 
 
 class UserWindow(QWidget):
