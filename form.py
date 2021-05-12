@@ -182,7 +182,12 @@ class WindowKeyboardTrainer(QMainWindow):
                                     font: bold 14px;
                               }''')
         self.level_sound = QComboBox(self)
-        self.level_sound.setGeometry(830, 20, 150, 60)
+        self.level_sound.setStyleSheet('''QComboBox {
+                                         font: Arial;
+                                         font:12px;
+                                   }''')
+        self.level_sound.setGeometry(830, 20, 150, 50)
+        self.level_sound.addItem("Выберите музыку")
         self.level_sound.addItem("AC/DC")
         self.level_sound.addItem("Antonio Vivaldi")
         self.level_sound.addItem("Gorillaz")
@@ -195,6 +200,8 @@ class WindowKeyboardTrainer(QMainWindow):
             self.sound_play("pictures/sound4.mp3")
         if self.level_sound.currentText() == "Gorillaz":
             self.sound_play("pictures/sound5.mp3")
+        if self.level_sound.currentText() == "Выберите музыку":
+            self.sound_off()
         self.sound_button.setIcon(QIcon("pictures/звук1.png"))
         self.sound_button.clicked.connect(self.sound_off)
 
@@ -211,8 +218,9 @@ class WindowKeyboardTrainer(QMainWindow):
         self.media_player.stop()
 
     def sound_on(self):
-        self.media_player.play()
-        self.media_player.setVolume(50)
+        if self.level_sound.currentText() != "Выберите музыку":
+            self.media_player.play()
+            self.media_player.setVolume(50)
         self.sound_button.setIcon(QIcon("pictures/звук1.png"))
         self.sound_button.clicked.connect(self.sound_off)
 
