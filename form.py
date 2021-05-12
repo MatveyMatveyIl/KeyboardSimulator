@@ -54,7 +54,6 @@ class MainWindow(QWidget):
         self.main_window.stat.clicked.connect(statistic.print_graph_statistic)
         self.main_window.show()
 
-
     def show_window(self, name):
         self.window = name
         self.window.show()
@@ -387,35 +386,7 @@ class WindowKeyboardTrainer(QMainWindow):
                     state_list.append(('wrong', position))
         self.set_color(state_list)
         self.stat.process_data(self.full_time_value.text(), self.user_text_box.toPlainText())
-        try:
-            if self.symbols_state[-1][0] == "wrong":
-                self.count_all_errors += 1
-                self.count_errors += 1
-                if self.text_to_write.toPlainText() not in self.dict_errors:
-                    if self.text_to_write.toPlainText().find(" ") != -1:
-                        index = state_list[-1][1]
-                        index1 = 0
-                        index2 = 0
-                        if self.text_to_write.toPlainText()[index] != ',' or ' ' or '-':
-                            a = (self.text_to_write.toPlainText().replace(',', '')).replace('.', '')
-                            for i in range(0, len(self.text_to_write.toPlainText())):
-                                if a[index - i] == ' ':
-                                    index1 = index - i
-                                    break
-                            for x in range(0, len(self.text_to_write.toPlainText())):
-                                if a[index + x] == ' ':
-                                    index2 = index + x
-                                    break
-                            if a[index1:index2].strip() not in self.dict_errors:
-                                if index1 < 0:
-                                    index1 = 0
-                                self.dict_errors.append(a[index1:index2].strip())
-                                self.dict_errors.remove("")
-                    else:
-                        self.dict_errors.append(self.text_to_write.toPlainText())
-                dictionary.sentences["ошибки"] = list(set(self.dict_errors))
-        except IndexError:
-            pass
+        self.add_errors(state_list)
 
     def add_errors(self, state_list):
         try:
@@ -445,8 +416,8 @@ class WindowKeyboardTrainer(QMainWindow):
                     else:
                         self.dict_errors.append(self.text_to_write.toPlainText())
                 dictionary.sentences["ошибки"] = list(set(self.dict_errors))
-        except IndexError:
-            pass
+        except:
+            IndexError
 
     @pyqtSlot()
     def update_time(self):

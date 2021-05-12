@@ -4,7 +4,6 @@ from data import *
 
 def main():
     login()
-    print(take_results())
     app = QApplication(sys.argv)
     app.setStyleSheet(form_style.style)
     window = MainWindow()
