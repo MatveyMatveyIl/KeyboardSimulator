@@ -16,8 +16,8 @@ except Exception as e:
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
-        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
-        QMessageBox
+    QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
+    QMessageBox, QInputDialog
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion
     from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp, QUrl, QDir
     from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent
@@ -372,11 +372,9 @@ class WindowKeyboardTrainer(QMainWindow):
     def switch_window(self):
         message = QMessageBox.information(self, "Сохранение", 'не забудьте сохранить результат', QMessageBox.Ok, QMessageBox.Cancel)
         if QMessageBox.Ok == message:
-            self.menu.close()
             self.main_window = MainWindow()
-            self.main_window.show()
             self.main_window.show_main_window()
-            self.main_window.close()
+            self.close()
 
     def eventFilter(self, obj, event):
         """Check input if pressed key is Enter"""
