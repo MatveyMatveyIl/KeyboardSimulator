@@ -30,7 +30,7 @@ class MainWindow(QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
-        self.setFixedSize(380, 450)
+        self.setFixedSize(380, 350)
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
         buttons_name = ['Помощь', 'Статистика', 'Добавить текст', 'Старт']
         buttons = []
@@ -45,18 +45,50 @@ class MainWindow(QWidget):
         self.button_start = buttons[3]
 
     def show_main_window(self):
-        windows = {'keyboard': WindowKeyboardTrainer(), 'add_text': AddTextWindow()}
+        windows = {'keyboard': WindowKeyboardTrainer(), 'add_text': AddTextWindow(), 'helper': AddHelperWindow()}
         self.main_window = MainWindow()
         self.main_window.button_start.clicked.connect(lambda: self.show_window(windows['keyboard']))
         self.main_window.button_start.clicked.connect(self.main_window.close)
         self.main_window.add_text.clicked.connect(lambda: self.show_window(windows['add_text']))
         self.main_window.add_text.clicked.connect(self.main_window.close)
         self.main_window.stat.clicked.connect(statistic.print_graph_statistic)
+        self.main_window.helper.clicked.connect(lambda: self.show_window(windows['helper']))
         self.main_window.show()
 
     def show_window(self, name):
         self.window = name
         self.window.show()
+
+
+class AddHelperWindow(QWidget):
+    def __init__(self):
+        super(AddHelperWindow, self).__init__()
+        self.setWindowTitle('Keyboard simulator')
+        self.setFixedSize(970, 465)
+        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
+        self.help = QLabel(self)
+        self.help.setGeometry(10, 10, 950, 440)
+        self.help.setText("\n 1.Чтобы начать тренировку нажмите кнопку 'Старт' в меню \n \n"
+                          " 2.Выберите один из режимов тренировки:"
+                          "\n \n    - С ошибками (Вы можете не исправлять свои ошибки)"
+                          "\n    - Без ошибок (Вы не продвинетесь с места, пока не исправите ошибки в тексте)"
+                          "\n    - Работа над ошибками (Вы можете посмотреть в каих словах была допущена ошибка и "
+                          "исправить их) \n "
+                          "\n 3.Выберите словарь: слова, предложение или текст, также вы можете добавить свой "
+                          "словарь.\n "
+                          " Для этого в меню нажмите 'Добавить текст', введите название словаря и сам текст \n"
+                          "\n 4.При желании вы можете выбрать музыку, которая будет сопровождать тренировку\n"
+                          "\n 5.Нажмите 'Старт'\n"
+                          "\n 6.Вы можете нажать 'Пауза', чтобы приостановить тренировку, затем 'Продолжить' \n"
+                          "\nПо каждой сессии выводится статистика, вы можете ее увидеть справа в окне тренировки \n"
+                          "\nГрафик статистки вы можете посмотреть, нажав 'Статистика' в меню \n"
+                          "\nПри завершении тренировки не забудьте нажать 'Завершить и сохранить'")
+        self.help.setWordWrap(True)
+        self.help.setStyleSheet('''QLabel {
+                                                font: Arial;
+                                                font: 16px;
+                                                qproperty-alignment: AlignLeft;
+                                          }''')
 
 
 class AddTextWindow(QWidget):
@@ -168,7 +200,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.level_mode.addItem("Без ошибок")
         self.level_mode.addItem("Работа над ошибками")
         self.level_mode.activated[str].connect(self.block_change)
-        
+
         self.sound_button = QPushButton(self)
         self.sound_button.setGeometry(780, 20, 35, 35)
         self.sound_button.clicked.connect(self.sound_on)
