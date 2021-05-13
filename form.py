@@ -32,7 +32,7 @@ class MainWindow(QWidget):
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(380, 350)
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
-        buttons_name = ['Помощь', 'Статистика', 'Добавить текст', 'Старт']
+        buttons_name = ['Помощь', 'Статистика', 'Словари', 'Старт']
         buttons = []
         for i, name in enumerate(buttons_name):
             button = QPushButton(self)
@@ -93,17 +93,26 @@ class AddHelperWindow(QWidget):
 
 class AddTextWindow(QWidget):
     def __init__(self):
+        from modules.dictionary import sentences
         super(AddTextWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(970, 465)
         self.setWindowIcon(QIcon('pictures/programmIcon.png'))
         self.topic = QTextEdit(self)
-        self.topic.setGeometry(305, 30, 330, 50)
+        self.topic.setGeometry(45, 30, 330, 50)
         self.topic.setPlaceholderText("Введите название")
         self.text = QTextEdit(self)
         self.text.setGeometry(45, 130, 870, 250)
         self.text.setPlaceholderText(
             "Вставьте текст. Слова должны состоять как минимум из 3 символов, предложения из 10")
+        self.dicts = QComboBox(self)
+        self.dicts.setGeometry(400, 30, 330, 50)
+        for name in sentences.keys():
+            self.dicts.addItem(name)
+        self.delete_btn = QPushButton(self)
+        self.delete_btn.setGeometry(750, 30, 100, 50)
+        self.delete_btn.setText('Удалить')
+        self.delete_btn.clicked.connect(self.delete_dict)
         buttons_name = ['Слова', 'Предложения', 'Текст', 'Назад']
         buttons = []
         for i, name in enumerate(buttons_name):
@@ -130,17 +139,32 @@ class AddTextWindow(QWidget):
     def add_words(self):
         create_words(self.text.toPlainText(), self.topic.toPlainText())
         self.save_dict()
+        self.update_names_dict()
         self.critical_text()
 
     def add_sentences(self):
         create_sentences(self.text.toPlainText(), self.topic.toPlainText())
         self.save_dict()
+        self.update_names_dict()
         self.critical_text()
 
     def add_text(self):
         create_text(self.text.toPlainText(), self.topic.toPlainText())
         self.save_dict()
+        self.update_names_dict()
         self.critical_text()
+
+    def delete_dict(self):
+        delete_key(self.dicts.currentText())
+        self.save_dict()
+        self.update_names_dict()
+        QMessageBox.information(self, "Успешно", "Словарь удален", QMessageBox.Ok)
+
+    def update_names_dict(self):
+        from modules.dictionary import sentences
+        self.dicts.clear()
+        for name in sentences.keys():
+            self.dicts.addItem(name)
 
     def critical_text(self):
         if len(self.text.toPlainText()) == 0:
@@ -406,7 +430,6 @@ class WindowKeyboardTrainer(QMainWindow):
         self.text_to_write_value = self.text_to_write.toPlainText()
 
     def for_work_errors(self):
-        from modules.dictionary import sentences
         self.user_text_box.clear()
         self.stopwatch.do_finish()
         self.full_stopwatch.do_pause()
