@@ -152,7 +152,7 @@ class AddTextWindow(QWidget):
 
     def save_dict(self):
         from modules.dictionary import sentences
-        with open('modules/dictionary.py', 'r+') as f:
+        with open('modules/dictionary.py', 'r+', encoding='utf-8') as f:
             a = sentences
             new_dict = 'sentences = ' + str(sentences)
             f.truncate()
@@ -312,6 +312,7 @@ class WindowKeyboardTrainer(QMainWindow):
 
     def start_session(self):
         """Session start/pause handling"""
+        from modules.dictionary import sentences
         if self.start.text() in {'Старт', 'Продолжить'}:
             self.user_text_box.setReadOnly(False)
             self.level_box.setDisabled(True)
@@ -394,6 +395,7 @@ class WindowKeyboardTrainer(QMainWindow):
         return False
 
     def equal_strings(self):
+        from modules.dictionary import sentences
         self.user_text_box.clear()
         self.stopwatch.do_finish()
         self.full_stopwatch.do_pause()
@@ -406,6 +408,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.text_to_write_value = self.text_to_write.toPlainText()
 
     def for_work_errors(self):
+        from modules.dictionary import sentences
         self.user_text_box.clear()
         self.stopwatch.do_finish()
         self.full_stopwatch.do_pause()
