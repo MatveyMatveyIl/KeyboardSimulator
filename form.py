@@ -129,14 +129,17 @@ class AddTextWindow(QWidget):
 
     def add_words(self):
         create_words(self.text.toPlainText(), self.topic.toPlainText())
+        self.save_dict()
         self.critical_text()
 
     def add_sentences(self):
         create_sentences(self.text.toPlainText(), self.topic.toPlainText())
+        self.save_dict()
         self.critical_text()
 
     def add_text(self):
         create_text(self.text.toPlainText(), self.topic.toPlainText())
+        self.save_dict()
         self.critical_text()
 
     def critical_text(self):
@@ -146,6 +149,14 @@ class AddTextWindow(QWidget):
             QMessageBox.critical(self, "Ошибка", "Введите название", QMessageBox.Ok)
         else:
             QMessageBox.information(self, "Успешно", "Словарь создан", QMessageBox.Ok)
+
+    def save_dict(self):
+        from modules.dictionary import sentences
+        with open('modules/dictionary.py', 'r+') as f:
+            a = sentences
+            new_dict = 'sentences = ' + str(sentences)
+            f.truncate()
+            f.write(new_dict)
 
 
 class WindowKeyboardTrainer(QMainWindow):
@@ -356,13 +367,15 @@ class WindowKeyboardTrainer(QMainWindow):
         self.menu.setGeometry(760, 610, 221, 41)
         self.menu.setText("Выход в меню")
         self.menu.clicked.connect(self.switch_window)
-        self.menu.clicked.connect(self.close)
 
     def switch_window(self):
-        self.main_window = MainWindow()
-        self.main_window.show()
-        self.main_window.show_main_window()
-        self.main_window.close()
+        message = QMessageBox.information(self, "Сохранение", 'не забудьте сохранить результат', QMessageBox.Ok, QMessageBox.Cancel)
+        if QMessageBox.Ok == message:
+            self.menu.close()
+            self.main_window = MainWindow()
+            self.main_window.show()
+            self.main_window.show_main_window()
+            self.main_window.close()
 
     def eventFilter(self, obj, event):
         """Check input if pressed key is Enter"""
