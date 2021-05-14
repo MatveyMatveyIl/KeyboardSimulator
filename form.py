@@ -194,6 +194,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.count_errors = 0
         self.dict_errors = []
         self.text_to_write_value = ''
+        self.current_level_box = ''
 
     def set_user_interface(self):
         self.set_window_interface()
@@ -344,7 +345,8 @@ class WindowKeyboardTrainer(QMainWindow):
                 self.stopwatch.do_start()
                 self.full_stopwatch.do_start()
             if len(self.text_to_write.toPlainText()) == 0:
-                self.text_to_write.setText(random.choice(sentences[self.level_box.currentText()]))
+                self.current_level_box = self.level_box.currentText()
+                self.text_to_write.setText(random.choice(sentences[self.current_level_box]))
                 self.text_to_write_value = self.text_to_write.toPlainText()
             if self.level_mode.currentText() == "Работа над ошибками":
                 self.text_to_write.clear()
@@ -353,6 +355,10 @@ class WindowKeyboardTrainer(QMainWindow):
                     QMessageBox.information(self, "Ошибок нет", 'Выберите другой режим', QMessageBox.Ok)
                 else:
                     self.text_to_write.setText(random.choice(sentences['ошибки']))
+            if self.current_level_box != self.level_box.currentText():
+                self.user_text_box.clear()
+                self.current_level_box = self.level_box.currentText()
+                self.text_to_write.setText(random.choice(sentences[self.current_level_box]))
             self.user_text_box.textChanged.connect(self.update_time)
             self.start.setText('Пауза')
         else:
@@ -427,7 +433,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.stat.statistic['WPM'].length += \
             len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
         self.count_errors = 0
-        self.text_to_write.setText(random.choice(sentences[self.level_box.currentText()]))
+        self.text_to_write.setText(random.choice(sentences[self.current_level_box]))
         self.text_to_write_value = self.text_to_write.toPlainText()
 
     def for_work_errors(self):
