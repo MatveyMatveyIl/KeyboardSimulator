@@ -522,11 +522,17 @@ class WindowKeyboardTrainer(QMainWindow):
         if len(self.user_text_box.toPlainText()) <= len(self.text_to_write.toPlainText()):
             for char_text in range(len(state_list)):
                 if state_list[char_text][0] == 'correct':
+                    if char_text < len(self.symbols_state):
+                        if state_list[char_text] == self.symbols_state[char_text]:
+                            continue
                     cursor.setPosition(state_list[char_text][1])
                     cursor.movePosition(cursor.Right, 1)
                     format.setBackground(QBrush(QColor('#a6f5c8')))
                     cursor.mergeCharFormat(format)
                 elif state_list[char_text][0] == 'wrong':
+                    if char_text < len(self.symbols_state):
+                        if state_list[char_text] == self.symbols_state[char_text]:
+                            continue
                     cursor.setPosition(state_list[char_text][1])
                     cursor.movePosition(cursor.Right, 1)
                     format.setBackground(QBrush(QColor('#ff6e6e')))
