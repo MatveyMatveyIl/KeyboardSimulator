@@ -314,7 +314,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.start.clicked.connect(self.user_text_box.setFocus)
         self.finish.clicked.connect(self.end_session)
         label_names = [('Время сеанса:', '00:00:00'), ('CPM:', '0 сим/мин'),
-                       ('WPM:', '0 слов/мин'), ('Количество ошибок за сеанс:', '0'), ('Количество ошибок:', '0')]
+                       ('WPM:', '0 слов/мин'), ('Ошибок за сеанс:', '0'), ('Количество ошибок:', '0')]
         labels = []
         for i, name in enumerate(label_names):
             label = QLabel(self)
