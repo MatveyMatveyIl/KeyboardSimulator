@@ -191,6 +191,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.full_stopwatch = StopWatch()
         self.symbols_state = []
         self.count_all_errors = set()
+        self.count_all_errors_value = 0
         self.count_errors = set()
         self.dict_errors = []
         self.text_to_write_value = ''
@@ -434,7 +435,9 @@ class WindowKeyboardTrainer(QMainWindow):
         self.timer_label.setText('0:00.00')
         self.stat.statistic['WPM'].length += \
             len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
+        self.count_all_errors_value += len(self.count_all_errors)
         self.count_errors.clear()
+        self.count_all_errors.clear()
         self.text_to_write.setText(random.choice(sentences[self.current_level_box]))
         self.text_to_write_value = self.text_to_write.toPlainText()
 
@@ -519,7 +522,7 @@ class WindowKeyboardTrainer(QMainWindow):
     def update_statistic(self):
         self.CPM_value.setText(str(self.stat.statistic['CPM'].value) + ' сим/мин')
         self.WPM_value.setText(str(self.stat.statistic['WPM'].value) + ' слов/мин')
-        self.all_errors_value.setText(str(len(self.count_all_errors)))
+        self.all_errors_value.setText(str(len(self.count_all_errors) + self.count_all_errors_value))
         self.errors_value.setText(str(len(self.count_errors)))
 
     @pyqtSlot()
