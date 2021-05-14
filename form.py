@@ -398,6 +398,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.menu.setGeometry(760, 610, 221, 41)
         self.menu.setText("Выход в меню")
         self.menu.clicked.connect(self.switch_window)
+        self.menu.clicked.connect(self.sound_off)
 
     def switch_window(self):
         message = QMessageBox.information(self, "Сохранение", 'не забудьте сохранить результат', QMessageBox.Ok,
@@ -476,19 +477,19 @@ class WindowKeyboardTrainer(QMainWindow):
                         index1 = 0
                         index2 = 0
                         if self.text_to_write_value[index] != ',' or ' ' or '-':
-                            a = (self.text_to_write_value.replace(',', '')).replace('.', '')
+                            text = (self.text_to_write_value.replace(',', '')).replace('.', '')
                             for i in range(0, len(self.text_to_write_value)):
-                                if a[index - i] == ' ':
+                                if text[index - i] == ' ':
                                     index1 = index - i
                                     break
                             for x in range(0, len(self.text_to_write_value)):
-                                if a[index + x] == ' ':
+                                if text[index + x] == ' ':
                                     index2 = index + x
                                     break
-                            if a[index1:index2].strip() not in self.dict_errors:
+                            if text[index1:index2].strip() not in self.dict_errors:
                                 if index1 < 0:
                                     index1 = 0
-                                self.dict_errors.append(a[index1:index2].strip())
+                                self.dict_errors.append(text[index1:index2].strip())
                                 self.dict_errors.remove("")
                     else:
                         self.dict_errors.append(self.text_to_write_value)
