@@ -16,8 +16,8 @@ except Exception as e:
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
-    QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
-    QMessageBox, QInputDialog
+        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
+        QMessageBox, QInputDialog
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion
     from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp, QUrl, QDir
     from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent
@@ -394,7 +394,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.menu.clicked.connect(self.switch_window)
 
     def switch_window(self):
-        message = QMessageBox.information(self, "Сохранение", 'не забудьте сохранить результат', QMessageBox.Ok, QMessageBox.Cancel)
+        message = QMessageBox.information(self, "Сохранение", 'не забудьте сохранить результат', QMessageBox.Ok,
+                                          QMessageBox.Cancel)
         if QMessageBox.Ok == message:
             self.main_window = MainWindow()
             self.main_window.show_main_window()
@@ -435,8 +436,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.full_stopwatch.do_pause()
         self.symbols_state = []
         self.timer_label.setText('0:00.00')
-        if self.text_to_write.toPlainText() in self.dict_errors:
-            self.dict_errors.remove(self.text_to_write.toPlainText())
+        if self.text_to_write_value in self.dict_errors:
+            self.dict_errors.remove(self.text_to_write_value)
             sentences['ошибки'] = self.dict_errors
         if len(self.dict_errors) > 0:
             self.text_to_write.setText(random.choice(sentences['ошибки']))
@@ -447,9 +448,10 @@ class WindowKeyboardTrainer(QMainWindow):
     def check_errors(self):
         """Checks the entered text and compares errors with the original"""
         state_list = []
-        if len(self.text_to_write.toPlainText()) >= len(self.user_text_box.toPlainText()):
-            for position in range(len(self.user_text_box.toPlainText())):
-                if self.user_text_box.toPlainText()[position] == self.text_to_write.toPlainText()[position]:
+        text = self.user_text_box.toPlainText()
+        if len(self.text_to_write_value) >= len(text):
+            for position in range(len(text)):
+                if text[position] == self.text_to_write_value[position]:
                     state_list.append(('correct', position))
                 else:
                     state_list.append(('wrong', position))
@@ -462,18 +464,18 @@ class WindowKeyboardTrainer(QMainWindow):
             if self.symbols_state[-1][0] == "wrong":
                 self.count_all_errors += 1
                 self.count_errors += 1
-                if self.text_to_write.toPlainText() not in self.dict_errors:
-                    if self.text_to_write.toPlainText().find(" ") != -1:
+                if self.text_to_write_value not in self.dict_errors:
+                    if self.text_to_write_value.find(" ") != -1:
                         index = state_list[-1][1]
                         index1 = 0
                         index2 = 0
-                        if self.text_to_write.toPlainText()[index] != ',' or ' ' or '-':
-                            a = (self.text_to_write.toPlainText().replace(',', '')).replace('.', '')
-                            for i in range(0, len(self.text_to_write.toPlainText())):
+                        if self.text_to_write_value[index] != ',' or ' ' or '-':
+                            a = (self.text_to_write_value.replace(',', '')).replace('.', '')
+                            for i in range(0, len(self.text_to_write_value)):
                                 if a[index - i] == ' ':
                                     index1 = index - i
                                     break
-                            for x in range(0, len(self.text_to_write.toPlainText())):
+                            for x in range(0, len(self.text_to_write_value)):
                                 if a[index + x] == ' ':
                                     index2 = index + x
                                     break
@@ -483,7 +485,7 @@ class WindowKeyboardTrainer(QMainWindow):
                                 self.dict_errors.append(a[index1:index2].strip())
                                 self.dict_errors.remove("")
                     else:
-                        self.dict_errors.append(self.text_to_write.toPlainText())
+                        self.dict_errors.append(self.text_to_write_value)
                 dictionary.sentences["ошибки"] = list(set(self.dict_errors))
         except:
             IndexError
