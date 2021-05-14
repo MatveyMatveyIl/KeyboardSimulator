@@ -9,7 +9,7 @@ except Exception as e:
 
 
 class StopWatch:
-    '''секундомер'''
+    """секундомер"""
     def __init__(self):
         super().__init__()
         self.time = 0
