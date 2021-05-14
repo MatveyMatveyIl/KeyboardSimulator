@@ -190,8 +190,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.stat = statistic.Statistic()
         self.full_stopwatch = StopWatch()
         self.symbols_state = []
-        self.count_all_errors = 0
-        self.count_errors = 0
+        self.count_all_errors = set()
+        self.count_errors = set()
         self.dict_errors = []
         self.text_to_write_value = ''
         self.current_level_box = ''
@@ -389,8 +389,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.WPM_value.setText("0 слов/мин")
         self.CPM_value.setText("0 сим/мин")
         self.all_errors_value.setText('0')
-        self.count_all_errors = 0
-        self.count_errors = 0
+        self.count_all_errors.clear()
+        self.count_errors.clear()
         self.errors_value.setText('0')
 
     def set_menubar_interface(self):
@@ -420,7 +420,7 @@ class WindowKeyboardTrainer(QMainWindow):
                 if self.level_mode.currentText() == "Работа над ошибками" \
                         and self.user_text_box.toPlainText() == self.text_to_write.toPlainText():
                     self.for_work_errors()
-                    self.count_errors = 0
+                    self.count_errors.clear()
                 return True
         return False
 
@@ -433,7 +433,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.timer_label.setText('0:00.00')
         self.stat.statistic['WPM'].length += \
             len(multiple_replace(self.user_text_box.toPlainText()).split(' '))
-        self.count_errors = 0
+        self.count_errors.clear()
         self.text_to_write.setText(random.choice(sentences[self.current_level_box]))
         self.text_to_write_value = self.text_to_write.toPlainText()
 
@@ -469,8 +469,8 @@ class WindowKeyboardTrainer(QMainWindow):
     def add_errors(self, state_list):
         try:
             if self.symbols_state[-1][0] == "wrong":
-                self.count_all_errors += 1
-                self.count_errors += 1
+                self.count_all_errors.add(self.symbols_state[-1][1])
+                self.count_errors.add(self.symbols_state[-1][1])
                 if self.text_to_write_value not in self.dict_errors:
                     if self.text_to_write_value.find(" ") != -1:
                         index = state_list[-1][1]
@@ -494,8 +494,8 @@ class WindowKeyboardTrainer(QMainWindow):
                     else:
                         self.dict_errors.append(self.text_to_write_value)
                 dictionary.sentences["ошибки"] = list(set(self.dict_errors))
-        except:
-            IndexError
+        except Exception as e:
+            pass
 
     @pyqtSlot()
     def update_time(self):
@@ -518,8 +518,8 @@ class WindowKeyboardTrainer(QMainWindow):
     def update_statistic(self):
         self.CPM_value.setText(str(self.stat.statistic['CPM'].value) + ' сим/мин')
         self.WPM_value.setText(str(self.stat.statistic['WPM'].value) + ' слов/мин')
-        self.all_errors_value.setText(str(self.count_all_errors))
-        self.errors_value.setText(str(self.count_errors))
+        self.all_errors_value.setText(str(len(self.count_all_errors)))
+        self.errors_value.setText(str(len(self.count_errors)))
 
     @pyqtSlot()
     def set_color(self, state_list):
