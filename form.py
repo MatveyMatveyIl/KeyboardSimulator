@@ -280,9 +280,10 @@ class WindowKeyboardTrainer(QMainWindow):
         self.media_player.play()
 
     def sound_off(self):
-        self.sound_button.setIcon(QIcon("pictures/звук2.png"))
-        self.sound_button.clicked.connect(self.sound_on)
-        self.media_player.stop()
+        if self.level_sound.currentText() != "Выберите музыку":
+                self.sound_button.setIcon(QIcon("pictures/звук2.png"))
+                self.sound_button.clicked.connect(self.sound_on)
+                self.media_player.stop()
 
     def sound_on(self):
         if self.level_sound.currentText() != "Выберите музыку":
