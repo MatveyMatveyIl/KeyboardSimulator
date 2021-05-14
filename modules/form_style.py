@@ -3,7 +3,7 @@ QWidget {
 
      font: medium Ubuntu;
      font-size: 16px;
-     background-image: url("pictures/background.jpg")
+     background-image: url("pictures_and_music/background.jpg")
 }
 QPushButton {                                      
     background: #B16CED;
