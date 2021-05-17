@@ -21,6 +21,8 @@ PyQt версии 5
 
 Sqlite версии 3
 
+Matplotlib 3.4
+
 # Состав
 
 Графическая версия: KeyboardTrainer.py
