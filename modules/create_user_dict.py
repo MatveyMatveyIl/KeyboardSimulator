@@ -3,15 +3,14 @@ from modules import dictionary
 
 
 def multiple_replace(string_to_parse):
-    replace_values = ['.', ',', '!', '?', ':', ';', '-']
+    replace_values = ['.', ',', '!', '?', ':', ';', '-', '(', ')', '*', '\n', '[', ']', '{', '}']
     for i in replace_values:
         string_to_parse = string_to_parse.replace(i, ' ')
     return string_to_parse
 
 
 def create_words(text, topic):
-    dictionary.sentences[topic] = list(filter(lambda x: len(x) > 3,
-                                              [x.strip() for x in multiple_replace(text).split(' ')]))
+    dictionary.sentences[topic] = list(filter(lambda x: len(x) > 3, re.findall(r'[\w]+', text)))
 
 
 def create_sentences(text, topic):
