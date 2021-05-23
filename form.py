@@ -466,8 +466,8 @@ class WindowKeyboardTrainer(QMainWindow):
         self.full_stopwatch.do_pause()
         self.symbols_state = []
         self.timer_label.setText('0:00.00')
-        if self.text_to_write_value in self.dict_errors:
-            self.dict_errors.remove(self.text_to_write_value)
+        if self.text_to_write.toPlainText() in self.dict_errors:
+            self.dict_errors.remove(self.text_to_write.toPlainText())
             sentences['ошибки'] = self.dict_errors
         if len(self.dict_errors) > 0:
             self.text_to_write.setText(random.choice(sentences['ошибки']))
@@ -478,10 +478,9 @@ class WindowKeyboardTrainer(QMainWindow):
     def check_errors(self):
         """Checks the entered text and compares errors with the original"""
         state_list = []
-        text = self.user_text_box.toPlainText()
-        if len(self.text_to_write_value) >= len(text):
-            for position in range(len(text)):
-                if text[position] == self.text_to_write_value[position]:
+        if len(self.text_to_write.toPlainText()) >= len(self.user_text_box.toPlainText()):
+            for position in range(len(self.user_text_box.toPlainText())):
+                if self.user_text_box.toPlainText()[position] == self.text_to_write.toPlainText()[position]:
                     state_list.append(('correct', position))
                 else:
                     state_list.append(('wrong', position))
