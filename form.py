@@ -45,19 +45,37 @@ class MainWindow(QWidget):
         self.button_start = buttons[3]
 
     def show_main_window(self):
-        windows = {'keyboard': WindowKeyboardTrainer(), 'add_text': AddTextWindow(), 'helper': AddHelperWindow()}
+        windows = {'keyboard': WindowKeyboardTrainer(), 'add_text': AddTextWindow(), 'helper': AddHelperWindow(), 'stat': CheckStat()}
         self.main_window = MainWindow()
         self.main_window.button_start.clicked.connect(lambda: self.show_window(windows['keyboard']))
         self.main_window.button_start.clicked.connect(self.main_window.close)
         self.main_window.add_text.clicked.connect(lambda: self.show_window(windows['add_text']))
         self.main_window.add_text.clicked.connect(self.main_window.close)
-        self.main_window.stat.clicked.connect(statistic.print_graph_statistic)
+        self.main_window.stat.clicked.connect(lambda: self.show_window(windows['stat']))
         self.main_window.helper.clicked.connect(lambda: self.show_window(windows['helper']))
         self.main_window.show()
 
     def show_window(self, name):
         self.window = name
         self.window.show()
+
+
+class CheckStat(QWidget):
+    def __init__(self):
+        super(CheckStat, self).__init__()
+        self.setWindowTitle('Keyboard simulator')
+        self.setFixedSize(190, 170)
+        self.setWindowIcon(QIcon('pictures_and_music/programmIcon.png'))
+        self.stat1 = QPushButton(self)
+        self.stat1.setGeometry(10, 10, 170, 50)
+        self.stat1.setText("По сессиям")
+        self.stat1.clicked.connect(statistic.print_graph_statistic1)
+        self.stat1.clicked.connect(self.close)
+        self.stat2 = QPushButton(self)
+        self.stat2.setGeometry(10, 100, 170, 50)
+        self.stat2.setText("По дням")
+        self.stat2.clicked.connect(statistic.print_graph_statistic)
+        self.stat2.clicked.connect(self.close)
 
 
 class AddHelperWindow(QWidget):
@@ -279,14 +297,14 @@ class WindowKeyboardTrainer(QMainWindow):
 
     def sound_off(self):
         if self.level_sound.currentText() != "Выберите музыку":
-                self.sound_button.setIcon(QIcon("pictures_and_music/звук2.png"))
-                self.sound_button.clicked.connect(self.sound_on)
-                self.media_player.stop()
+            self.sound_button.setIcon(QIcon("pictures_and_music/звук2.png"))
+            self.sound_button.clicked.connect(self.sound_on)
+            self.media_player.stop()
 
     def sound_on(self):
         if self.level_sound.currentText() != "Выберите музыку":
             self.media_player.play()
-            #self.media_player.setVolume(50)
+            # self.media_player.setVolume(50)
         self.sound_button.setIcon(QIcon("pictures_and_music/звук1.png"))
         self.sound_button.clicked.connect(self.sound_off)
 
