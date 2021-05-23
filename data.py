@@ -1,7 +1,6 @@
 try:
     import sqlite3
     import sys
-    import datetime
 except Exception as e:
     print('Modules not found: "{}". Try reinstalling the app.'.format(e))
     sys.exit(4)

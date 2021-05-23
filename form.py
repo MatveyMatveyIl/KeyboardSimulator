@@ -375,6 +375,10 @@ class WindowKeyboardTrainer(QMainWindow):
                      self.stat.statistic['WPM'].value,
                      self.stat.statistic['CPM'].value,
                      int(self.all_errors_value.text()))
+        save_results(str(datetime.datetime.now()),
+                     self.stat.statistic['WPM'].value,
+                     self.stat.statistic['CPM'].value,
+                     int(self.all_errors_value.text()))
         if len(self.user_text_box.toPlainText()) != 0:
             self.user_text_box.clear()
         self.text_to_write.setText('')
