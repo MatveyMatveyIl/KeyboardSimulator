@@ -31,7 +31,7 @@ class MainWindow(QWidget):
         super(MainWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(380, 350)
-        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
+        self.setWindowIcon(QIcon('pictures_and_music/programmIcon.png'))
         buttons_name = ['Помощь', 'Статистика', 'Словари', 'Старт']
         buttons = []
         for i, name in enumerate(buttons_name):
@@ -65,7 +65,7 @@ class AddHelperWindow(QWidget):
         super(AddHelperWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(970, 465)
-        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
+        self.setWindowIcon(QIcon('pictures_and_music/programmIcon.png'))
         self.help = QLabel(self)
         self.help.setGeometry(10, 10, 950, 440)
         self.help.setText("\n 1.Чтобы начать тренировку нажмите кнопку 'Старт' в меню \n \n"
@@ -97,7 +97,7 @@ class AddTextWindow(QWidget):
         super(AddTextWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(970, 465)
-        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
+        self.setWindowIcon(QIcon('pictures_and_music/programmIcon.png'))
         self.topic = QTextEdit(self)
         self.topic.setGeometry(45, 30, 330, 50)
         self.topic.setPlaceholderText("Введите название")
@@ -208,7 +208,7 @@ class WindowKeyboardTrainer(QMainWindow):
     def set_window_interface(self):
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(1028, 731)
-        self.setWindowIcon(QIcon('pictures/programmIcon.png'))
+        self.setWindowIcon(QIcon('pictures_and_music/programmIcon.png'))
 
     def set_user_text_box_interface(self):
         self.user_text_box = QTextEdit(self)
@@ -241,7 +241,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.sound_button = QPushButton(self)
         self.sound_button.setGeometry(780, 20, 35, 35)
         self.sound_button.clicked.connect(self.sound_on)
-        self.sound_button.setIcon(QIcon("pictures/звук2.png"))
+        self.sound_button.setIcon(QIcon("pictures_and_music/звук2.png"))
         self.sound_button.setStyleSheet('''QPushButton {
                                     background: white;
                                     border: 1px solid black;
@@ -263,14 +263,14 @@ class WindowKeyboardTrainer(QMainWindow):
 
     def check_level_sound(self):
         if self.level_sound.currentText() == "AC/DC":
-            self.sound_play("pictures/sound3.mp3")
+            self.sound_play("pictures_and_music/sound3.wav")
         if self.level_sound.currentText() == "Antonio Vivaldi":
-            self.sound_play("pictures/sound4.mp3")
+            self.sound_play("pictures_and_music/sound4.wav")
         if self.level_sound.currentText() == "Gorillaz":
-            self.sound_play("./pictures/sound5.mp3")
+            self.sound_play("pictures_and_music/sound5.wav")
         if self.level_sound.currentText() == "Выберите музыку":
             self.sound_off()
-        self.sound_button.setIcon(QIcon("pictures/звук1.png"))
+        self.sound_button.setIcon(QIcon("pictures_and_music/звук1.png"))
         self.sound_button.clicked.connect(self.sound_off)
 
     def sound_play(self, sound):
@@ -279,14 +279,15 @@ class WindowKeyboardTrainer(QMainWindow):
 
     def sound_off(self):
         if self.level_sound.currentText() != "Выберите музыку":
-                self.sound_button.setIcon(QIcon("pictures/звук2.png"))
+                self.sound_button.setIcon(QIcon("pictures_and_music/звук2.png"))
                 self.sound_button.clicked.connect(self.sound_on)
                 self.media_player.stop()
 
     def sound_on(self):
         if self.level_sound.currentText() != "Выберите музыку":
             self.media_player.play()
-        self.sound_button.setIcon(QIcon("pictures/звук1.png"))
+            #self.media_player.setVolume(50)
+        self.sound_button.setIcon(QIcon("pictures_and_music/звук1.png"))
         self.sound_button.clicked.connect(self.sound_off)
 
     def block_change(self):
