@@ -20,7 +20,7 @@ try:
         QMessageBox, QInputDialog
     from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion
     from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp, QUrl, QDir
-    from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent
+    from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent, QSound
 except Exception as e:
     print('PyQt5 not found: "{}".'.format(e))
     sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
@@ -263,21 +263,18 @@ class WindowKeyboardTrainer(QMainWindow):
 
     def check_level_sound(self):
         if self.level_sound.currentText() == "AC/DC":
-            self.sound_play("pictures_and_music/sound3.mp3")
+            self.sound_play("pictures_and_music/sound3.wav")
         if self.level_sound.currentText() == "Antonio Vivaldi":
-            self.sound_play("pictures_and_music/sound4.mp3")
+            self.sound_play("pictures_and_music/sound4.wav")
         if self.level_sound.currentText() == "Gorillaz":
-            self.sound_play("pictures_and_music/sound5.mp3")
+            self.sound_play("pictures_and_music/sound5.wav")
         if self.level_sound.currentText() == "Выберите музыку":
             self.sound_off()
         self.sound_button.setIcon(QIcon("pictures_and_music/звук1.png"))
         self.sound_button.clicked.connect(self.sound_off)
 
     def sound_play(self, sound):
-        self.media_player = QMediaPlayer()
-        self.url = QUrl.fromLocalFile(QDir.toNativeSeparators(sound))
-        self.media_player.setMedia(QMediaContent(self.url))
-        self.media_player.setVolume(50)
+        self.media_player = QSound(sound)
         self.media_player.play()
 
     def sound_off(self):
@@ -289,7 +286,7 @@ class WindowKeyboardTrainer(QMainWindow):
     def sound_on(self):
         if self.level_sound.currentText() != "Выберите музыку":
             self.media_player.play()
-            self.media_player.setVolume(50)
+            #self.media_player.setVolume(50)
         self.sound_button.setIcon(QIcon("pictures_and_music/звук1.png"))
         self.sound_button.clicked.connect(self.sound_off)
 
