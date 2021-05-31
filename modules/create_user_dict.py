@@ -19,7 +19,7 @@ def create_sentences(text, topic):
 
 
 def create_text(text, topic):
-    dictionary.sentences[topic] = [text]
+    dictionary.sentences[topic] = [text.replace('\n', ' ')]
 
 
 def delete_key(topic):
