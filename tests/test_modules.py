@@ -58,7 +58,7 @@ class TestModules(unittest.TestCase):
         self.assertEqual(43.0, self.stat.statistic['CPM'].value)
 
     def test_db(self):
-        login()
+        login_db()
         save_results('1.1.1', 1, 2, 3)
         self.assertEqual(('1.1.1', 1, 2, 3), *take_results())
         save_results('1.1.1', 5, 4, 3)

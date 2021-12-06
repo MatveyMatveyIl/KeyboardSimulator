@@ -1,9 +1,8 @@
 from form import *
-from data import *
+from data import Session, UserResults
 
 
 def main():
-    login()
     app = QApplication(sys.argv)
     app.setStyleSheet(form_style.style)
     window = MainWindow()

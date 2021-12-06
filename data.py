@@ -1,46 +1,55 @@
-try:
-    import sqlite3
-    import sys
-except Exception as e:
-    print('Modules not found: "{}". Try reinstalling the app.'.format(e))
-    sys.exit(4)
+from sqlalchemy import create_engine, Integer, String, Column, Date, Float
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+engine = create_engine('sqlite:///' + os.path.join(basedir, 'statistic.db'))
+session = Session(bind=engine)
+Base = declarative_base()
 
 
-def login():
-    global db
-    global sql
-    db = sqlite3.connect('user.db')
-    sql = db.cursor()
-    sql.execute("""CREATE TABLE IF NOT EXISTS user_results(
-        datetime TEXT,
-        wpm BIGINT,
-        cpm BIGINT,
-        errors BIGINT
-    )""")
-    db.commit()
+class UserResults(Base):
+    __tablename__ = 'session_result'
+    id = Column(Integer(), primary_key=True)
+    date = Column(Date())
+    CPM = Column(Integer())
+    WPM = Column(Integer())
+    Errors = Column(Integer())
+    Count = Column(Integer())
+
+
+Base.metadata.create_all(engine)
 
 
 def save_results(date, new_wpm, new_cpm, new_errors):
-    sql.execute(f"SELECT datetime FROM user_results WHERE datetime = '{date}'")
-    if sql.fetchone() is None:
-        sql.execute("""INSERT INTO user_results VALUES (?, ?, ?, ?)""", (date, new_wpm, new_cpm, new_errors))
-        db.commit()
+    result = session.query(UserResults).filter(UserResults.date == date).first()
+    if result:
+        result.CPM += new_cpm
+        result.WPM += new_wpm
+        result.Errors += new_errors
+        result.Count += 1
+        session.commit()
     else:
-        for old_wpm in sql.execute(f"SELECT wpm FROM user_results WHERE datetime = '{date}'"):
-            sql.execute(f"UPDATE user_results SET wpm = {(old_wpm[0] + new_wpm) // 2} WHERE datetime = '{date}'")
-            db.commit()
-        for old_cpm in sql.execute(f"SELECT cpm FROM user_results WHERE datetime = '{date}'"):
-            sql.execute(f"UPDATE user_results SET cpm = {(old_cpm[0] + new_cpm) // 2} WHERE datetime = '{date}'")
-            db.commit()
-        for old_errors in sql.execute(f"SELECT errors FROM user_results WHERE datetime = '{date}'"):
-            sql.execute(f"UPDATE user_results SET errors = {(old_errors[0] + new_errors)} WHERE datetime = '{date}'")
-            db.commit()
+        to_save = UserResults(
+            date=date,
+            CPM=new_cpm,
+            WPM=new_wpm,
+            Errors=new_errors,
+            Count=1
+        )
+        session.add(to_save)
+        session.commit()
+
+    take_results()
+
 
 
 def take_results():
     results = []
-    for result in sql.execute('SELECT * FROM user_results'):
-        results.append(result)
+    query = session.query(UserResults)
+    for result in query:
+        new_result = [result.date, result.WPM // result.Count, result.CPM // result.Count, result.Errors]
+        results.append(new_result)
 
     return results
-

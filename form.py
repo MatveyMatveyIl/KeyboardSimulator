@@ -1,18 +1,14 @@
-try:
-    from modules.dictionary import sentences
-    import sys
-    import random
-    from modules import EXCEPTIONS, statistic
-    from modules import form_style
-    from modules.stopwatch import *
-    from modules.create_user_dict import *
-    import datetime
-    from data import *
-    import matplotlib.pyplot as plt
-    import numpy as np
-except Exception as e:
-    print('Modules not found: "{}". Try reinstalling the app.'.format(e))
-    sys.exit(4)
+from modules.dictionary import sentences
+import sys
+import random
+from modules import EXCEPTIONS, statistic
+from modules import form_style
+from modules.stopwatch import *
+from modules.create_user_dict import *
+import datetime
+from data import *
+import matplotlib.pyplot as plt
+import numpy as np
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
@@ -389,11 +385,11 @@ class WindowKeyboardTrainer(QMainWindow):
         """End session handling"""
         self.level_box.setDisabled(False)
         self.user_text_box.setReadOnly(True)
-        save_results(str(datetime.datetime.now()).split(' ')[0],
-                     self.stat.statistic['WPM'].value,
-                     self.stat.statistic['CPM'].value,
-                     int(self.all_errors_value.text()))
-        save_results(str(datetime.datetime.now()),
+        # save_results(datetime.datetime.now().split(' ')[0],
+        #              self.stat.statistic['WPM'].value,
+        #              self.stat.statistic['CPM'].value,
+        #              int(self.all_errors_value.text()))
+        save_results(datetime.datetime.now().date(),
                      self.stat.statistic['WPM'].value,
                      self.stat.statistic['CPM'].value,
                      int(self.all_errors_value.text()))
