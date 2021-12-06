@@ -496,8 +496,6 @@ class WindowKeyboardTrainer(QMainWindow):
                 self.dictionaries["ошибки"] = list(set(self.errors_session))
         except Exception as e:
             pass
-        "привет яма Матвей дада я"
-        'я адад йевтаМ амя тевирп'
 
     @pyqtSlot()
     def update_time(self):
