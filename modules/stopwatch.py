@@ -1,15 +1,9 @@
-import sys
-from modules import EXCEPTIONS
-
-try:
-    from PyQt5.QtCore import QTimer
-except Exception as e:
-    print('PyQt5 not found: "{}".'.format(e))
-    sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
+from PyQt5.QtCore import QTimer
 
 
 class StopWatch:
     """секундомер"""
+
     def __init__(self):
         super().__init__()
         self.time = 0

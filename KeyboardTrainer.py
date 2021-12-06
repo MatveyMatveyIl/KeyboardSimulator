@@ -1,5 +1,5 @@
 from form import *
-from data import Session, UserResults
+from data import Session
 
 
 def main():

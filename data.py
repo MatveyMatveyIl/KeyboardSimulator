@@ -44,7 +44,6 @@ def save_results(date, new_wpm, new_cpm, new_errors):
     take_results()
 
 
-
 def take_results():
     results = []
     query = session.query(UserResults)

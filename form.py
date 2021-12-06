@@ -1,7 +1,7 @@
-from modules.dictionary import sentences
 import sys
+from modules.load_dict import load_dict, update_dict
 import random
-from modules import EXCEPTIONS, statistic
+from modules import statistic
 from modules import form_style
 from modules.stopwatch import *
 from modules.create_user_dict import *
@@ -10,16 +10,12 @@ from data import *
 import matplotlib.pyplot as plt
 import numpy as np
 
-try:
-    from PyQt5.QtWidgets import QApplication, QMainWindow, \
-        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
-        QMessageBox, QInputDialog
-    from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion
-    from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp, QUrl, QDir
-    from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent, QSound
-except Exception as e:
-    print('PyQt5 not found: "{}".'.format(e))
-    sys.exit(EXCEPTIONS.ERROR_QT_VERSION)
+from PyQt5.QtWidgets import QApplication, QMainWindow, \
+    QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
+    QMessageBox, QInputDialog
+from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion
+from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp, QUrl, QDir
+from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent, QSound
 
 
 class MainWindow(QWidget):
@@ -41,7 +37,8 @@ class MainWindow(QWidget):
         self.button_start = buttons[3]
 
     def show_main_window(self):
-        windows = {'keyboard': WindowKeyboardTrainer(), 'add_text': AddTextWindow(), 'helper': AddHelperWindow(), 'stat': CheckStat()}
+        windows = {'keyboard': WindowKeyboardTrainer(), 'add_text': AddTextWindow(), 'helper': AddHelperWindow(),
+                   'stat': CheckStat()}
         self.main_window = MainWindow()
         self.main_window.button_start.clicked.connect(lambda: self.show_window(windows['keyboard']))
         self.main_window.button_start.clicked.connect(self.main_window.close)
@@ -108,7 +105,7 @@ class AddHelperWindow(QWidget):
 
 class AddTextWindow(QWidget):
     def __init__(self):
-        from modules.dictionary import sentences
+        self.sentences = load_dict()
         super(AddTextWindow, self).__init__()
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(970, 465)
@@ -122,7 +119,7 @@ class AddTextWindow(QWidget):
             "Вставьте текст. Слова должны состоять как минимум из 3 символов, предложения из 10")
         self.dicts = QComboBox(self)
         self.dicts.setGeometry(400, 30, 330, 50)
-        for name in sentences.keys():
+        for name in self.sentences.keys():
             self.dicts.addItem(name)
         self.delete_btn = QPushButton(self)
         self.delete_btn.setGeometry(750, 30, 100, 50)
@@ -152,55 +149,50 @@ class AddTextWindow(QWidget):
         self.main_window.close()
 
     def add_words(self):
-        create_words(self.text.toPlainText(), self.topic.toPlainText())
-        self.save_dict()
-        self.update_names_dict()
-        self.critical_text()
+        if self.critical_text():
+            create_words(self.text.toPlainText(), self.topic.toPlainText(), self.sentences)
+            update_dict(self.sentences)
+            self.update_names_dict()
 
     def add_sentences(self):
-        create_sentences(self.text.toPlainText(), self.topic.toPlainText())
-        self.save_dict()
-        self.update_names_dict()
-        self.critical_text()
+        if self.critical_text():
+            create_sentences(self.text.toPlainText(), self.topic.toPlainText(), self.sentences)
+            update_dict(self.sentences)
+            self.update_names_dict()
 
     def add_text(self):
-        create_text(self.text.toPlainText(), self.topic.toPlainText())
-        self.save_dict()
-        self.update_names_dict()
-        self.critical_text()
+        if self.critical_text():
+            create_text(self.text.toPlainText(), self.topic.toPlainText(), self.sentences)
+            update_dict(self.sentences)
+            self.update_names_dict()
 
     def delete_dict(self):
-        delete_key(self.dicts.currentText())
-        self.save_dict()
+        delete_key(self.dicts.currentText(), self.sentences)
+        update_dict(self.sentences)
         self.update_names_dict()
         QMessageBox.information(self, "Успешно", "Словарь удален", QMessageBox.Ok)
 
     def update_names_dict(self):
-        from modules.dictionary import sentences
         self.dicts.clear()
-        for name in sentences.keys():
+        for name in self.sentences.keys():
             self.dicts.addItem(name)
 
     def critical_text(self):
         if len(self.text.toPlainText()) == 0:
             QMessageBox.critical(self, "Ошибка", "Вы не ввели текст", QMessageBox.Ok)
+            return False
         elif len(self.topic.toPlainText()) == 0:
             QMessageBox.critical(self, "Ошибка", "Введите название", QMessageBox.Ok)
+            return False
         else:
             QMessageBox.information(self, "Успешно", "Словарь создан", QMessageBox.Ok)
-
-    def save_dict(self):
-        from modules.dictionary import sentences
-        with open('modules/dictionary.py', 'r+', encoding='utf-8') as f:
-            a = sentences
-            new_dict = 'sentences = ' + str(sentences)
-            f.truncate()
-            f.write(new_dict)
+            return True
 
 
 class WindowKeyboardTrainer(QMainWindow):
     def __init__(self):
         super(WindowKeyboardTrainer, self).__init__()
+        self.dictionaries = load_dict()
         self.set_user_interface()
         self.stat = statistic.Statistic()
         self.full_stopwatch = StopWatch()
@@ -243,7 +235,7 @@ class WindowKeyboardTrainer(QMainWindow):
     def set_level_box_interface(self):
         self.level_box = QComboBox(self)
         self.level_box.setGeometry(780, 120, 200, 60)
-        for topic in dictionary.sentences.keys():
+        for topic in self.dictionaries.keys():
             self.level_box.addItem(topic)
 
         self.level_mode = QComboBox(self)
@@ -351,7 +343,6 @@ class WindowKeyboardTrainer(QMainWindow):
 
     def start_session(self):
         """Session start/pause handling"""
-        from modules.dictionary import sentences
         if self.start.text() in {'Старт', 'Продолжить'}:
             self.user_text_box.setReadOnly(False)
             self.level_box.setDisabled(True)
@@ -360,7 +351,7 @@ class WindowKeyboardTrainer(QMainWindow):
                 self.full_stopwatch.do_start()
             if len(self.text_to_write.toPlainText()) == 0:
                 self.current_level_box = self.level_box.currentText()
-                self.text_to_write.setText(random.choice(sentences[self.current_level_box]))
+                self.text_to_write.setText(random.choice(self.dictionaries[self.current_level_box]))
                 self.text_to_write_value = self.text_to_write.toPlainText()
             if self.level_mode.currentText() == "Работа над ошибками":
                 self.text_to_write.clear()
@@ -368,11 +359,11 @@ class WindowKeyboardTrainer(QMainWindow):
                 if len(self.dict_errors) == 0:
                     QMessageBox.information(self, "Ошибок нет", 'Выберите другой режим', QMessageBox.Ok)
                 else:
-                    self.text_to_write.setText(random.choice(sentences['ошибки']))
+                    self.text_to_write.setText(random.choice(self.dictionaries['ошибки']))
             if self.current_level_box != self.level_box.currentText():
                 self.user_text_box.clear()
                 self.current_level_box = self.level_box.currentText()
-                self.text_to_write.setText(random.choice(sentences[self.current_level_box]))
+                self.text_to_write.setText(random.choice(self.dictionaries[self.current_level_box]))
             self.user_text_box.textChanged.connect(self.update_time)
             self.start.setText('Пауза')
         else:
@@ -443,7 +434,6 @@ class WindowKeyboardTrainer(QMainWindow):
         return False
 
     def equal_strings(self):
-        from modules.dictionary import sentences
         self.user_text_box.clear()
         self.stopwatch.do_finish()
         self.full_stopwatch.do_pause()
@@ -454,7 +444,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.count_all_errors_value += len(self.count_all_errors)
         self.count_errors.clear()
         self.count_all_errors.clear()
-        self.text_to_write.setText(random.choice(sentences[self.current_level_box]))
+        self.text_to_write.setText(random.choice(self.dictionaries[self.current_level_box]))
         self.text_to_write_value = self.text_to_write.toPlainText()
 
     def for_work_errors(self):
@@ -465,9 +455,9 @@ class WindowKeyboardTrainer(QMainWindow):
         self.timer_label.setText('0:00.00')
         if self.text_to_write.toPlainText() in self.dict_errors:
             self.dict_errors.remove(self.text_to_write.toPlainText())
-            sentences['ошибки'] = self.dict_errors
+            self.dictionaries['ошибки'] = self.dict_errors
         if len(self.dict_errors) > 0:
-            self.text_to_write.setText(random.choice(sentences['ошибки']))
+            self.text_to_write.setText(random.choice(self.dictionaries['ошибки']))
         else:
             QMessageBox.information(self, "Вы закончили", 'поздравляем', QMessageBox.Ok)
 
@@ -512,7 +502,7 @@ class WindowKeyboardTrainer(QMainWindow):
                                 self.dict_errors.remove("")
                     else:
                         self.dict_errors.append(self.text_to_write_value)
-                dictionary.sentences["ошибки"] = list(set(self.dict_errors))
+                self.dictionaries["ошибки"] = list(set(self.dict_errors))
         except Exception as e:
             pass
 
