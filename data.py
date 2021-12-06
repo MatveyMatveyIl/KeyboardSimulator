@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import create_engine, Integer, String, Column, Date, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session

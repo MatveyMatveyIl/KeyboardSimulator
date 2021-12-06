@@ -1,3 +1,6 @@
+from matplotlib.backends.backend_template import FigureCanvas
+from matplotlib.figure import Figure, SubplotParams
+
 from modules.dictionary import sentences
 import sys
 import random
@@ -12,9 +15,9 @@ import numpy as np
 
 try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, \
-        QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
-        QMessageBox, QInputDialog
-    from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion
+    QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
+    QMessageBox, QInputDialog, QVBoxLayout
+    from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion, QImage, QPixmap
     from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp, QUrl, QDir
     from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent, QSound
 except Exception as e:
@@ -66,13 +69,28 @@ class CheckStat(QWidget):
         self.stat1 = QPushButton(self)
         self.stat1.setGeometry(10, 10, 170, 50)
         self.stat1.setText("По сессиям")
-        self.stat1.clicked.connect(self.user_stat.get_figure)
+        self.stat1.clicked.connect(self.show_window)
         self.stat1.clicked.connect(self.close)
         self.stat2 = QPushButton(self)
         self.stat2.setGeometry(10, 100, 170, 50)
         self.stat2.setText("По дням")
-        self.stat2.clicked.connect(self.user_stat.get_figure)
+        self.stat2.clicked.connect(self.show_window)
         self.stat2.clicked.connect(self.close)
+
+    def show_window(self):
+        self.window = StatisticGraph()
+        self.window.show()
+
+
+class StatisticGraph(QWidget):
+    def __init__(self):
+        super(StatisticGraph, self).__init__()
+        statistic.UsersStatistic().get_figure()
+        image_label = QLabel(self)
+        pixmap = QPixmap("statistic.png")
+        image_label.setPixmap(pixmap)
+        self.resize(pixmap.width(), pixmap.height())
+        self.setWindowTitle('Статистика')
 
 
 class AddHelperWindow(QWidget):

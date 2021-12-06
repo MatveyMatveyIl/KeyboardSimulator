@@ -57,12 +57,12 @@ class UsersStatistic:
         self.cpm = []
         self.errors = []
         self.stat = []
-        self.x = np.array(self.stat)
-        self.y = np.array(self.wpm)
-        self.y1 = np.array(self.cpm)
-        self.y2 = np.array(self.errors)
+        self.x = []
+        self.y = []
+        self.y1 = []
+        self.y2 = []
 
-    def print_graph(self):
+    def add_value(self):
         for i in range(len(self.data)):
             self.stat.append(self.data[i][0])
             self.wpm.append(self.data[i][1])
@@ -70,85 +70,23 @@ class UsersStatistic:
             self.errors.append(self.data[i][3])
 
     def get_figure(self):
-        plt.figure(figsize=(17, 7))
-        figure = plt.get_current_fig_manager()
-        figure.canvas.manager.set_window_title("Статистика")
-        self.set_coordinates("Wpm", 1, self.x, self.y)
-        self.set_coordinates("Cpm", 2, self.x, self.y1)
-        self.set_coordinates("Ошибки", 3, self.x, self.y2)
-        plt.show()
+        self.add_value()
+        self.set_coordinates()
+        figure = plt.figure(figsize=(17, 10))
+        self.print_statistic("Wpm", 1, self.x, self.y)
+        self.print_statistic("Cpm", 2, self.x, self.y1)
+        self.print_statistic("Ошибки", 3, self.x, self.y2)
+        figure.savefig("statistic.png")
 
-    @staticmethod
-    def set_coordinates(title, plot, x, y):
+    def set_coordinates(self):
+        self.x = np.array(self.stat)
+        self.y = np.array(self.wpm)
+        self.y1 = np.array(self.cpm)
+        self.y2 = np.array(self.errors)
+
+    def print_statistic(self, title, plot, x, y):
         plt.subplot(2, 2, plot)
         plt.plot(x, y, '-', marker="o", c="g")
         plt.title(title)
         plt.grid()
 
-# def print_graph_statistic(self):
-#     date = []
-#     wpm = []
-#     cpm = []
-#     errors = []
-#     data = take_results()
-#     for i in range(len(data)):
-#         if len(data[i][0]) == 10:
-#             date.append(data[i][0])
-#             wpm.append(data[i][1])
-#             cpm.append(data[i][2])
-#             errors.append(data[i][3])
-#     x = np.array(date)
-#     y = np.array(wpm)
-#     y1 = np.array(cpm)
-#     y2 = np.array(errors)
-#
-#     plt.figure(figsize=(17, 7))
-#     man = plt.get_current_fig_manager()
-#     man.canvas.set_window_title("Статистика")
-#     plt.subplot(221)
-#     plt.plot(x, y, '-', marker="o", c="g")
-#     plt.title("Wpm")
-#     plt.grid()
-#     plt.subplot(222)
-#     plt.plot(x, y1, '-.', marker="o", c="b")
-#     plt.title("Cpm")
-#     plt.grid()
-#     plt.subplot(223)
-#     plt.plot(x, y2, '--', marker="o", c="r")
-#     plt.title("Ошибки")
-#     plt.grid()
-#     plt.show()
-#
-#
-# def print_graph_statistic1(self):
-#     date1 = []
-#     wpm1 = []
-#     cpm1 = []
-#     errors1 = []
-#     data = take_results()
-#     for i in range(len(data)):
-#         if len(data[i][0]) != 10:
-#             date1.append(((data[i][0]).split("."))[0])
-#             wpm1.append(data[i][1])
-#             cpm1.append(data[i][2])
-#             errors1.append(data[i][3])
-#     x1 = np.array(date1)
-#     y11 = np.array(wpm1)
-#     y111 = np.array(cpm1)
-#     y21 = np.array(errors1)
-#     plt.figure(figsize=(17, 7))
-#     man = plt.get_current_fig_manager()
-#     man.canvas.set_window_title("Статистика")
-#     plt.subplot(221)
-#     plt.plot(x1, y11, '-', marker="o", c="g")
-#     plt.title("Wpm")
-#     plt.grid()
-#     plt.subplot(222)
-#     plt.plot(x1, y111, '-.', marker="o", c="b")
-#     plt.title("Cpm")
-#     plt.grid()
-#     plt.subplot(223)
-#     plt.plot(x1, y21, '--', marker="o", c="r")
-#     plt.title("Ошибки")
-#     plt.grid()
-#     plt.show()
