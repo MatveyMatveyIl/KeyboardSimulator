@@ -51,5 +51,4 @@ def take_results():
     for result in query:
         new_result = [result.date, result.WPM // result.Count, result.CPM // result.Count, result.Errors]
         results.append(new_result)
-    print(results)
     return results

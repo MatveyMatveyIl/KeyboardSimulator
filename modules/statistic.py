@@ -53,7 +53,6 @@ class CPM:
 class UsersStatistic:
     def __init__(self):
         self.data = take_results()
-        print(take_results())
         self.wpm = []
         self.cpm = []
         self.errors = []
@@ -73,7 +72,7 @@ class UsersStatistic:
     def get_figure(self):
         plt.figure(figsize=(17, 7))
         figure = plt.get_current_fig_manager()
-        figure.canvas.set_window_title("Статистика")
+        figure.canvas.manager.set_window_title("Статистика")
         self.set_coordinates("Wpm", 1, self.x, self.y)
         self.set_coordinates("Cpm", 2, self.x, self.y1)
         self.set_coordinates("Ошибки", 3, self.x, self.y2)
