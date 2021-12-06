@@ -200,7 +200,7 @@ class WindowKeyboardTrainer(QMainWindow):
         self.count_all_errors = set()
         self.count_all_errors_value = 0
         self.count_errors = set()
-        self.dict_errors = []
+        self.errors_session = []
         self.text_to_write_value = ''
         self.current_level_box = ''
 
@@ -293,7 +293,6 @@ class WindowKeyboardTrainer(QMainWindow):
     def sound_on(self):
         if self.level_sound.currentText() != "Выберите музыку":
             self.media_player.play()
-            # self.media_player.setVolume(50)
         self.sound_button.setIcon(QIcon("pictures_and_music/звук1.png"))
         self.sound_button.clicked.connect(self.sound_off)
 
@@ -356,7 +355,7 @@ class WindowKeyboardTrainer(QMainWindow):
             if self.level_mode.currentText() == "Работа над ошибками":
                 self.text_to_write.clear()
                 self.user_text_box.clear()
-                if len(self.dict_errors) == 0:
+                if len(self.errors_session) == 0:
                     QMessageBox.information(self, "Ошибок нет", 'Выберите другой режим', QMessageBox.Ok)
                 else:
                     self.text_to_write.setText(random.choice(self.dictionaries['ошибки']))
@@ -452,10 +451,10 @@ class WindowKeyboardTrainer(QMainWindow):
         self.full_stopwatch.do_pause()
         self.symbols_state = []
         self.timer_label.setText('0:00.00')
-        if self.text_to_write.toPlainText() in self.dict_errors:
-            self.dict_errors.remove(self.text_to_write.toPlainText())
-            self.dictionaries['ошибки'] = self.dict_errors
-        if len(self.dict_errors) > 0:
+        if self.text_to_write.toPlainText() in self.errors_session:
+            self.errors_session.remove(self.text_to_write.toPlainText())
+            self.dictionaries['ошибки'] = self.errors_session
+        if len(self.errors_session) > 0:
             self.text_to_write.setText(random.choice(self.dictionaries['ошибки']))
         else:
             QMessageBox.information(self, "Вы закончили", 'поздравляем', QMessageBox.Ok)
@@ -479,31 +478,26 @@ class WindowKeyboardTrainer(QMainWindow):
             if self.symbols_state[-1][0] == "wrong":
                 self.count_all_errors.add(self.symbols_state[-1][1])
                 self.count_errors.add(self.symbols_state[-1][1])
-                if self.text_to_write_value not in self.dict_errors:
+                if self.text_to_write_value not in self.errors_session:
                     if self.text_to_write_value.find(" ") != -1:
                         index = state_list[-1][1]
-                        index1 = 0
-                        index2 = 0
                         if self.text_to_write_value[index] != ',' or ' ' or '-':
-                            text = (self.text_to_write_value.replace(',', '')).replace('.', '')
-                            for i in range(len(self.text_to_write_value)):
-                                if text[index - i] == ' ':
-                                    index1 = index - i
-                                    break
-                            for x in range(len(self.text_to_write_value)):
-                                if text[index + x] == ' ':
-                                    index2 = index + x
-                                    break
-                            if text[index1:index2].strip() not in self.dict_errors:
-                                if index1 < 0:
-                                    index1 = 0
-                                self.dict_errors.append(text[index1:index2].strip())
-                                self.dict_errors.remove("")
+                            index1 = self.text_to_write_value.find(' ', index)
+                            index1 = len(self.text_to_write_value) if index1 == -1 else index1
+                            index2 = self.text_to_write_value[::-1].find(' ',
+                                                                         len(self.text_to_write_value) - index)
+                            index2 = 0 if index2 == - 1 else len(self.text_to_write_value) - index2
+                            if self.text_to_write_value[index2:index1].strip() not in self.errors_session:
+                                self.errors_session.append(
+                                    self.text_to_write_value[index2:index1].strip())
+                                print(self.errors_session)
                     else:
-                        self.dict_errors.append(self.text_to_write_value)
-                self.dictionaries["ошибки"] = list(set(self.dict_errors))
+                        self.errors_session.append(self.text_to_write_value)
+                self.dictionaries["ошибки"] = list(set(self.errors_session))
         except Exception as e:
             pass
+        "привет яма Матвей дада я"
+        'я адад йевтаМ амя тевирп'
 
     @pyqtSlot()
     def update_time(self):
