@@ -59,18 +59,19 @@ class MainWindow(QWidget):
 class CheckStat(QWidget):
     def __init__(self):
         super(CheckStat, self).__init__()
+        self.user_stat = statistic.UsersStatistic()
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(190, 170)
         self.setWindowIcon(QIcon('pictures_and_music/programmIcon.png'))
         self.stat1 = QPushButton(self)
         self.stat1.setGeometry(10, 10, 170, 50)
         self.stat1.setText("По сессиям")
-        self.stat1.clicked.connect(statistic.print_graph_statistic1)
+        self.stat1.clicked.connect(self.user_stat.get_figure)
         self.stat1.clicked.connect(self.close)
         self.stat2 = QPushButton(self)
         self.stat2.setGeometry(10, 100, 170, 50)
         self.stat2.setText("По дням")
-        self.stat2.clicked.connect(statistic.print_graph_statistic)
+        self.stat2.clicked.connect(self.user_stat.get_figure)
         self.stat2.clicked.connect(self.close)
 
 
