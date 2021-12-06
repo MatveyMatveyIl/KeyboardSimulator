@@ -377,10 +377,6 @@ class WindowKeyboardTrainer(QMainWindow):
         """End session handling"""
         self.level_box.setDisabled(False)
         self.user_text_box.setReadOnly(True)
-        # save_results(datetime.datetime.now().split(' ')[0],
-        #              self.stat.statistic['WPM'].value,
-        #              self.stat.statistic['CPM'].value,
-        #              int(self.all_errors_value.text()))
         save_results(datetime.datetime.now().date(),
                      self.stat.statistic['WPM'].value,
                      self.stat.statistic['CPM'].value,
@@ -406,16 +402,19 @@ class WindowKeyboardTrainer(QMainWindow):
         self.menu = QPushButton(self)
         self.menu.setGeometry(760, 610, 221, 41)
         self.menu.setText("Выход в меню")
-        self.menu.clicked.connect(self.switch_window)
+        self.menu.clicked.connect(self.save_before_exit)
         self.menu.clicked.connect(self.sound_off)
 
-    def switch_window(self):
-        message = QMessageBox.information(self, "Сохранение", 'не забудьте сохранить результат', QMessageBox.Ok,
-                                          QMessageBox.Cancel)
-        if QMessageBox.Ok == message:
-            self.main_window = MainWindow()
-            self.main_window.show_main_window()
-            self.close()
+    def save_before_exit(self):
+        if self.stat.statistic['WPM'] != 0 or self.stat.statistic['CPM'] != 0:
+            save_results(datetime.datetime.now().date(),
+                         self.stat.statistic['WPM'].value,
+                         self.stat.statistic['CPM'].value,
+                         int(self.all_errors_value.text()))
+            self.stat.nullify_result()
+        self.main_window = MainWindow()
+        self.main_window.show_main_window()
+        self.close()
 
     def eventFilter(self, obj, event):
         """Check input if pressed key is Enter"""
@@ -487,11 +486,11 @@ class WindowKeyboardTrainer(QMainWindow):
                         index2 = 0
                         if self.text_to_write_value[index] != ',' or ' ' or '-':
                             text = (self.text_to_write_value.replace(',', '')).replace('.', '')
-                            for i in range(0, len(self.text_to_write_value)):
+                            for i in range(len(self.text_to_write_value)):
                                 if text[index - i] == ' ':
                                     index1 = index - i
                                     break
-                            for x in range(0, len(self.text_to_write_value)):
+                            for x in range(len(self.text_to_write_value)):
                                 if text[index + x] == ' ':
                                     index2 = index + x
                                     break
