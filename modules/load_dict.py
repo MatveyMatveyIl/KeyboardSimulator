@@ -1,7 +1,8 @@
 import json
-
+import os
 
 def load_dict():
+    path = os.path.abspath('dictionary.json')
     with open('modules/dictionary.json', 'r') as f:
         return json.load(f)
 
