@@ -13,7 +13,7 @@ import numpy as np
 from PyQt5.QtWidgets import QApplication, QMainWindow, \
     QLineEdit, QLabel, QComboBox, QMenuBar, QMenu, QAction, QTextEdit, QPlainTextEdit, QWidget, QPushButton, \
     QMessageBox, QInputDialog
-from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion
+from PyQt5.QtGui import QIcon, QTextCharFormat, QFont, QSyntaxHighlighter, QColor, QBrush, QRegion, QPixmap
 from PyQt5.QtCore import QTimer, pyqtSlot, QEvent, QRegularExpression, Qt, QRegExp, QUrl, QDir
 from PyQt5.QtMultimedia import QMultimedia, QMediaPlayer, QMediaContent, QSound
 
@@ -60,17 +60,26 @@ class CheckStat(QWidget):
         self.setWindowTitle('Keyboard simulator')
         self.setFixedSize(190, 170)
         self.setWindowIcon(QIcon('pictures_and_music/programmIcon.png'))
-        self.stat1 = QPushButton(self)
-        self.stat1.setGeometry(10, 10, 170, 50)
-        self.stat1.setText("По сессиям")
-        self.stat1.clicked.connect(self.user_stat.get_figure)
-        self.stat1.clicked.connect(self.close)
-        self.stat2 = QPushButton(self)
-        self.stat2.setGeometry(10, 100, 170, 50)
-        self.stat2.setText("По дням")
-        self.stat2.clicked.connect(self.user_stat.get_figure)
-        self.stat2.clicked.connect(self.close)
+        self.stat_of_days = QPushButton(self)
+        self.stat_of_days.setGeometry(10, 50, 170, 50)
+        self.stat_of_days.setText("По дням")
+        self.stat_of_days.clicked.connect(self.show_window)
+        self.stat_of_days.clicked.connect(self.close)
 
+    def show_window(self):
+        self.window = StatisticGraph()
+        self.window.show()
+
+
+class StatisticGraph(QWidget):
+    def __init__(self):
+        super(StatisticGraph, self).__init__()
+        statistic.UsersStatistic().get_figure()
+        image_label = QLabel(self)
+        pixmap = QPixmap("statistic.png")
+        image_label.setPixmap(pixmap)
+        self.resize(pixmap.width(), pixmap.height())
+        self.setWindowTitle('Статистика')
 
 class AddHelperWindow(QWidget):
     def __init__(self):
